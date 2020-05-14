@@ -60,7 +60,7 @@ int CALLBACK WinMain(
 		0, CLASS_NAME,
 		"SpaceGame",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		200, 200, 640, 480,
+		CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
 		nullptr, nullptr, hInstance, nullptr
 	);
 	
