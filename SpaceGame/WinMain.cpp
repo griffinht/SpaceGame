@@ -33,6 +33,14 @@ int CALLBACK WinMain(
 		200, 200, 640, 480,
 		nullptr, nullptr, hInstance, nullptr
 	);
-	while (true);
+	
+	ShowWindow(hWnd, SW_SHOW);
+
+	MSG msg;
+	while (GetMessage(&msg, nullptr, 0, 0) > 0)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	return 0;
 }
