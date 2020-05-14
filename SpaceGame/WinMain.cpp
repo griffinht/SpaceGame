@@ -1,7 +1,16 @@
 #include <Windows.h>
+#include <sstream>
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	std::stringstream ss;
+	std::string str;
+
+	ss << msg;
+	ss >> str;
+	OutputDebugString(str.c_str());
+	OutputDebugString("\n");
+
 	switch (msg)
 	{
 	case WM_CLOSE:
@@ -17,7 +26,7 @@ int CALLBACK WinMain(
 	LPSTR     lpCmdLine,
 	int       nCmdShow)
 {
-	const auto pClassName = "SpaceGame Class Thing";
+	const LPCSTR CLASS_NAME = "SpaceGame Class Thing";
 
 	// window class
 	WNDCLASSEX wc = { 0 };
@@ -32,13 +41,13 @@ int CALLBACK WinMain(
 	wc.hIcon = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = pClassName;
+	wc.lpszClassName = CLASS_NAME;
 	wc.hIconSm = nullptr;
 	RegisterClassEx(&wc);
 
 	// window instance
 	HWND hWnd = CreateWindowEx(
-		0, pClassName,
+		0, CLASS_NAME,
 		"SpaceGame",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		200, 200, 640, 480,
