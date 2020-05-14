@@ -17,7 +17,7 @@ int CALLBACK WinMain(
 	LPSTR     lpCmdLine,
 	int       nCmdShow)
 {
-	const auto pClassName = "something";
+	const auto pClassName = "SpaceGame Class Thing";
 
 	// window class
 	WNDCLASSEX wc = { 0 };
@@ -39,7 +39,7 @@ int CALLBACK WinMain(
 	// window instance
 	HWND hWnd = CreateWindowEx(
 		0, pClassName,
-		"a new window",
+		"SpaceGame",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		200, 200, 640, 480,
 		nullptr, nullptr, hInstance, nullptr
