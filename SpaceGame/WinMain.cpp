@@ -4,17 +4,27 @@
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	std::stringstream ss;
-	std::string str;
 
 	ss << msg;
-	ss >> str;
-	OutputDebugString(str.c_str());
+	OutputDebugString(ss.str().c_str());
 	OutputDebugString("\n");
 
 	switch (msg)
 	{
 	case WM_CLOSE:
 		PostQuitMessage(0);
+		break;
+	case WM_KEYDOWN:
+		break;
+	case WM_KEYUP:
+		break;
+	case WM_CHAR:
+		break;
+	case WM_LBUTTONDOWN: //last click
+		POINTS pt = MAKEPOINTS(lParam);
+		std::ostringstream oss;
+		oss << "(" << pt.x << ", " << pt.y << ")";
+		SetWindowText(hWnd, oss.str().c_str());
 		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -60,7 +70,7 @@ int CALLBACK WinMain(
 	BOOL gResult;
 	while ((gResult = GetMessage(&msg, nullptr, 0, 0) > 0))
 	{
-		TranslateMessage(&msg);
+		TranslateMessage(&msg); //optional, remove?
 		DispatchMessage(&msg);
 	}
 
