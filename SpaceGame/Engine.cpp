@@ -17,7 +17,10 @@ Engine::Engine() : window("SpaceGame")
 		else
 		{
 			Sleep(0);
-			//game stuff
+			if (true)//ticks
+			{
+				Draw(0);//elapsed
+			}
 		}
 	}
 }
@@ -29,5 +32,6 @@ Engine::~Engine()
 
 void Engine::Draw(float dt)
 {
-	//todo
+	window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
+	window.Graphics().FlipBuffer();
 }
