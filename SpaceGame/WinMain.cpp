@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "Engine.h"
 #include <sstream>
 
 int CALLBACK WinMain(
@@ -7,24 +7,6 @@ int CALLBACK WinMain(
 	LPSTR     lpCmdLine,
 	int       nCmdShow)
 {
-	Window* window = new Window("SpaceGame");
-
-	MSG msg;
-	BOOL gResult;
-	while ((gResult = GetMessage(&msg, nullptr, 0, 0) > 0))
-	{
-		TranslateMessage(&msg); //optional, remove?
-		DispatchMessage(&msg);
-	}
-	
-	delete window;
-
-	if (gResult == -1)
-	{	
-		return -1;
-	}
-	else
-	{
-		return msg.wParam;
-	}
+	Engine();
+	return -1;
 }

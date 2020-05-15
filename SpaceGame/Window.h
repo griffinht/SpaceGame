@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include <string>
 #include <memory>
+#include <optional>
 
 class Window
 {

@@ -52,3 +52,8 @@ Graphics::~Graphics()
 		pDevice->Release();
 	}
 }
+
+void Graphics::FlipBuffer()
+{
+	pSwap->Present(1u, 0u);
+}

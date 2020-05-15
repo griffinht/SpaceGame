@@ -8,6 +8,7 @@ class Graphics
 public:
 	Graphics(HWND hWnd);
 	~Graphics();
+	void FlipBuffer();
 private:
 	ID3D11Device* pDevice = nullptr;
 	IDXGISwapChain* pSwap = nullptr;
