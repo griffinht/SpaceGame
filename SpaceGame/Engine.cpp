@@ -25,7 +25,7 @@ Engine::Engine() : window("SpaceGame")
 				last = now;
 				tick++;
 				//do tick here
-				double dt = std::chrono::duration<double, std::milli>(now - last).count();//tick may have taken time, this should be interpolated
+				dt = std::chrono::duration<double, std::milli>(now - last).count();//tick may have taken time, this should be interpolated
 			}
 			Draw(tick, dt);//check if exceeds max framerate
 			//Sleep(0);
