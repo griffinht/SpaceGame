@@ -151,12 +151,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="EngineException.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="EngineException.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
