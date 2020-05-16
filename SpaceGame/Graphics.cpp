@@ -3,9 +3,11 @@
 
 #pragma comment(lib, "d3d11.lib")
 
+namespace wrl = Microsoft::WRL;
+
 //needs hr to be defined
-#define GRAPHICS_THROW_FAILED(hrcall) if(FAILED(hr = (hrcall))) throw Graphics::HrException( __LINE__, __FILE__,hr)
-#define GRAPHICS_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__, __FILE__, (hr))
+#define GRAPHICS_THROW_FAILED(hrcall) if(FAILED(hr = (hrcall))) throw Graphics::HrException( __LINE__, __FILE__, hr)
+#define GRAPHICS_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__, __FILE__, hr)
 
 Graphics::Graphics(HWND hWnd)
 {
@@ -42,30 +44,9 @@ Graphics::Graphics(HWND hWnd)
 		&pContext
 	));
 
-	ID3D11Resource* pBackBuffer = nullptr;
-	GRAPHICS_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer)));
-	GRAPHICS_THROW_FAILED(pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pTarget));
-	pBackBuffer->Release();
-}
-
-Graphics::~Graphics()
-{
-	if (pDevice != nullptr)
-	{
-		pDevice->Release();
-	}
-	if (pSwap != nullptr)
-	{
-		pSwap->Release();
-	}
-	if (pContext != nullptr)
-	{
-		pContext->Release();
-	}
-	if (pTarget != nullptr)
-	{
-		pTarget->Release();
-	}
+	wrl::ComPtr<ID3D11Resource> pBackBuffer;
+	GRAPHICS_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
+	GRAPHICS_THROW_FAILED(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget));
 }
 
 void Graphics::FlipBuffer()
@@ -88,7 +69,7 @@ void Graphics::FlipBuffer()
 void Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.0f };
-	pContext->ClearRenderTargetView(pTarget, color);
+	pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) :
