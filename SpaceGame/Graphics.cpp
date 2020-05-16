@@ -122,6 +122,11 @@ Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::
 		info += msg;
 		info.push_back('\n');
 	}
+
+	if (!info.empty())
+	{
+		info.pop_back();
+	}
 }
 
 const char* Graphics::HrException::what() const
