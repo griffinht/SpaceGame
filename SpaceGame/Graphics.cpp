@@ -152,12 +152,12 @@ void Graphics::drawTriangle()
 
 	// viewport
 	D3D11_VIEWPORT vp;
-	vp.Width = 400;
-	vp.Height = 400;
+	vp.Width = 1280;
+	vp.Height = 720;
 	vp.MinDepth = 0;
 	vp.MaxDepth = 1;
-	vp.TopLeftX = 200;
-	vp.TopLeftY = 200;
+	vp.TopLeftX = 0;
+	vp.TopLeftY = 0;
 	pContext->RSSetViewports(1u, &vp);
 
 	GRAPHICS_THROW_INFO_ONLY(pContext->Draw((UINT)std::size(vertices), 0u));
