@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include <sstream>
 
 #pragma comment(lib,"d3d11.lib")
 
@@ -75,4 +76,89 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget, color);
+}
+
+Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) :
+	EngineException(line, file),
+	hr(hr)
+{
+	for (const auto& msg : infoMessages)
+	{
+		info += msg;
+		info.push_back('\n');
+	}
+
+	if (!info.empty())
+	{
+		info.pop_back();
+	}
+}
+
+const char* Graphics::HrException::what() const
+{
+	std::ostringstream oss;
+	oss << GetType() << " generated error code 0x" << std::hex << std::uppercase << GetErrorCode()
+		<< " caused by " << GetOriginString() << std::endl;
+	
+	if (!info.empty())
+	{
+		oss << std::endl << GetErrorInfo() << std::endl;
+	}
+
+	whatBuffer = oss.str();
+	return whatBuffer.c_str();
+}
+
+const char* Graphics::HrException::GetType() const
+{
+	return "Graphics HrException";
+}
+
+HRESULT Graphics::HrException::GetErrorCode() const
+{
+	return hr;
+}
+
+std::string Graphics::HrException::GetErrorInfo() const
+{
+	return info;
+}
+
+const char* Graphics::DeviceRemovedException::GetType() const
+{
+	return "Graphics Device Removed Exception (DXGI_ERROR_DEVICE_REMOVED)";
+}
+Graphics::InfoException::InfoException(int line, const char* file, std::vector<std::string> infoMessages)
+	:
+	EngineException(line, file)
+{
+	for (const auto& message : infoMessages)
+	{
+		info += message;
+		info.push_back('\n');
+	}
+
+	if (!info.empty())
+	{
+		info.pop_back();
+	}
+}
+
+const char* Graphics::InfoException::what() const
+{
+	std::ostringstream oss;
+	oss << GetType() << " generated " << GetErrorInfo()
+		<< " caused by " << GetOriginString() << std::endl;
+	whatBuffer = oss.str();
+	return whatBuffer.c_str();
+}
+
+const char* Graphics::InfoException::GetType() const
+{
+	return "Graphics Info Exception";
+}
+
+std::string Graphics::InfoException::GetErrorInfo() const
+{
+	return info;
 }
