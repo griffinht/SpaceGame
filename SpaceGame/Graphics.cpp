@@ -1,7 +1,11 @@
 #include "Graphics.h"
 #include <sstream>
 
-#pragma comment(lib,"d3d11.lib")
+#pragma comment(lib, "d3d11.lib")
+
+//needs hr to be defined
+#define GRAPHICS_THROW_FAILED(hrcall) if(FAILED(hr = (hrcall))) throw Graphics::HrException( __LINE__, __FILE__,hr)
+#define GRAPHICS_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__, __FILE__, (hr))
 
 Graphics::Graphics(HWND hWnd)
 {
@@ -22,7 +26,8 @@ Graphics::Graphics(HWND hWnd)
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
-	D3D11CreateDeviceAndSwapChain(
+	HRESULT hr;
+	GRAPHICS_THROW_FAILED(D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
@@ -35,15 +40,11 @@ Graphics::Graphics(HWND hWnd)
 		&pDevice,
 		nullptr,
 		&pContext
-	);
+	));
 
 	ID3D11Resource* pBackBuffer = nullptr;
-	pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer));
-	pDevice->CreateRenderTargetView(
-		pBackBuffer,
-		nullptr,
-		&pTarget
-	);
+	GRAPHICS_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer)));
+	GRAPHICS_THROW_FAILED(pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pTarget));
 	pBackBuffer->Release();
 }
 
@@ -69,7 +70,19 @@ Graphics::~Graphics()
 
 void Graphics::FlipBuffer()
 {
-	pSwap->Present(1u, 0u);
+	HRESULT hr;
+	if (FAILED(hr = pSwap->Present(1u, 0u)))
+	{
+		if (hr == DXGI_ERROR_DEVICE_REMOVED)
+		{
+			throw GRAPHICS_DEVICE_REMOVED_EXCEPT(pDevice->GetDeviceRemovedReason());
+		}
+		else
+		{
+			GRAPHICS_THROW_FAILED(hr);
+		}
+	}
+	
 }
 
 void Graphics::ClearBuffer(float red, float green, float blue)
