@@ -25,11 +25,6 @@ Engine::Engine() : window("SpaceGame")
 	}
 }
 
-Engine::~Engine()
-{
-	//todo
-}
-
 void Engine::Draw(float dt)
 {
 	window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
