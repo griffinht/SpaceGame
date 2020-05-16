@@ -32,6 +32,11 @@ void Engine::Draw(float dt)
 		window.Graphics().drawTriangle();
 		window.Graphics().FlipBuffer();
 	}
+	catch (Graphics::InfoException& e)
+	{
+		OutputDebugString("Nonfatal Engine Error:");
+		OutputDebugString(e.what());
+	}
 	catch (EngineException& e)
 	{
 		OutputDebugString("Fatal Engine Error: ");

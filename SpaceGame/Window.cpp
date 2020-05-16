@@ -28,7 +28,7 @@ Window::Window(const char* name)
 		0, CLASS_NAME,
 		name,
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
+		CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720,
 		nullptr, nullptr, hInstance, nullptr
 	);
 

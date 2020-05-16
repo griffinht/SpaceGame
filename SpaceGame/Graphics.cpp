@@ -2,8 +2,10 @@
 #include <sstream>
 #include "Window.h"
 #include "GraphicsThrowMacros.h"
+#include <d3dcompiler.h>
 
 #pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "D3DCompiler.lib")
 
 namespace wrl = Microsoft::WRL;
 
@@ -77,6 +79,7 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 void Graphics::drawTriangle()
 {
 	namespace wrl = Microsoft::WRL;
+	HRESULT hr;
 
 	struct Vertex
 	{
@@ -84,7 +87,7 @@ void Graphics::drawTriangle()
 		float y;
 	};
 
-	//make buffer
+	// make buffer
 	const Vertex vertices[] =
 	{
 		{ 0.0f, 0.5f },
@@ -103,13 +106,61 @@ void Graphics::drawTriangle()
 	D3D11_SUBRESOURCE_DATA sd = {};
 	sd.pSysMem = vertices;
 	
-	//bind
-	HRESULT hr;
+	// bind buffer to pipeline
 	GRAPHICS_THROW_INFO(pDevice->CreateBuffer(&bd, &sd, &pVertexBuffer));
 	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
-	pContext->IASetVertexBuffers(0u, 1u, &pVertexBuffer, &stride, &offset);
-	pContext->Draw(3u, 0u);
+	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
+
+	wrl::ComPtr<ID3DBlob> pBlob;
+
+	// create pixel shader
+	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
+	GRAPHICS_THROW_INFO(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
+	GRAPHICS_THROW_INFO(pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
+	// bind pixel shader
+	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+
+	// create and vertex shader
+	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
+	GRAPHICS_THROW_INFO(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
+	GRAPHICS_THROW_INFO(pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
+	// bind vertex shader
+	pContext->VSSetShader(pVertexShader.Get(), 0, 0);
+
+	// input
+	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
+	const D3D11_INPUT_ELEMENT_DESC ied[] =
+	{
+		{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+	GRAPHICS_THROW_INFO(pDevice->CreateInputLayout(
+		ied, (UINT)std::size(ied),
+		pBlob->GetBufferPointer(),
+		pBlob->GetBufferSize(),
+		&pInputLayout
+	));
+
+	// bind vertext layout
+	pContext->IASetInputLayout(pInputLayout.Get());
+
+	// bind render target
+	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), nullptr);
+
+	// set primitive to triangle list
+	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// viewport
+	D3D11_VIEWPORT vp;
+	vp.Width = 400;
+	vp.Height = 400;
+	vp.MinDepth = 0;
+	vp.MaxDepth = 1;
+	vp.TopLeftX = 200;
+	vp.TopLeftY = 200;
+	pContext->RSSetViewports(1u, &vp);
+
+	GRAPHICS_THROW_INFO_ONLY(pContext->Draw((UINT)std::size(vertices), 0u));
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) 
