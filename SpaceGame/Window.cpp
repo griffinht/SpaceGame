@@ -115,8 +115,8 @@ Window::HrException::HrException(int line, const char* file, HRESULT hr)
 const char* Window::HrException::what() const
 {
 	std::ostringstream oss;
-	oss << GetType() << " generated error code " << std::hex << std::uppercase << GetErrorCode()
-		<< " caused by " << GetOriginString() << std::endl;
+	oss << GetType() << " generated error code 0x" << std::hex << std::uppercase << GetErrorCode()
+		<< " in " << GetOriginString() << std::endl;
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }
