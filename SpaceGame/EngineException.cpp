@@ -11,14 +11,14 @@ EngineException::EngineException(int line, const char* file) :
 const char* EngineException::what() const
 {
 	std::ostringstream oss;
-	oss << GetType() << " " << GetOriginString();
+	oss << GetType() << " occured in " << GetOriginString();
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }
 
 const char* EngineException::GetType() const
 {
-	return "Engine Exception";
+	return "Unknown Engine Exception";
 }
 
 int EngineException::GetLine() const
@@ -34,6 +34,6 @@ const std::string& EngineException::GetFile() const
 std::string EngineException::GetOriginString() const
 {
 	std::ostringstream oss;
-	oss << "error occured in " << file << " at line " << line;
+	oss << file << " at line " << line;
 	return oss.str();
 }

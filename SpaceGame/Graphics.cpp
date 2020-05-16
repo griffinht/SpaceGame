@@ -122,22 +122,17 @@ Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::
 		info += msg;
 		info.push_back('\n');
 	}
-
-	if (!info.empty())
-	{
-		info.pop_back();
-	}
 }
 
 const char* Graphics::HrException::what() const
 {
 	std::ostringstream oss;
 	oss << GetType() << " generated error code 0x" << std::hex << std::uppercase << GetErrorCode()
-		<< " caused by " << GetOriginString() << std::endl;
+		<< " in " << GetOriginString() << std::endl;
 	
 	if (!info.empty())
 	{
-		oss << std::endl << GetErrorInfo() << std::endl;
+		oss << std::endl << "Details: " << std::endl << GetErrorInfo() << std::endl;
 	}
 
 	whatBuffer = oss.str();
@@ -182,9 +177,9 @@ Graphics::InfoException::InfoException(int line, const char* file, std::vector<s
 const char* Graphics::InfoException::what() const
 {
 	std::ostringstream oss;
-	oss << GetType() << " generated " << GetErrorInfo()
-		<< " caused by " << GetOriginString() << std::endl
-		<< info << std::endl;
+	oss << GetType() << " in " << GetOriginString() << std::endl
+		<< std::endl << "Details:" << std::endl
+		<< GetErrorInfo() << std::endl;
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }

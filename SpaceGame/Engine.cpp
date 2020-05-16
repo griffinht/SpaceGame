@@ -34,7 +34,7 @@ void Engine::Draw(float dt)
 	}
 	catch (EngineException& e)
 	{
-		OutputDebugString("Fatal Exception, terminating\n");
+		OutputDebugString("Fatal Engine Error: ");
 		OutputDebugString(e.what());
 		PostQuitMessage(-1);
 	}
