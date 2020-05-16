@@ -27,6 +27,14 @@ Engine::Engine() : window("SpaceGame")
 
 void Engine::Draw(float dt)
 {
-	window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
-	window.Graphics().FlipBuffer();
+	try {
+		window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
+		window.Graphics().drawTriangle();
+		window.Graphics().FlipBuffer();
+	}
+	catch (EngineException e)
+	{
+		OutputDebugString(e.what());
+		PostQuitMessage(-1);
+	}
 }

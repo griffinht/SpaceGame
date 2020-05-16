@@ -1,14 +1,11 @@
 #include "Graphics.h"
 #include <sstream>
 #include "Window.h"
+#include "GraphicsThrowMacros.h"
 
 #pragma comment(lib, "d3d11.lib")
 
 namespace wrl = Microsoft::WRL;
-
-//needs hr to be defined
-#define GRAPHICS_THROW_FAILED(hrcall) if(FAILED(hr = (hrcall))) throw Graphics::HrException( __LINE__, __FILE__, hr)
-#define GRAPHICS_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__, __FILE__, hr)
 
 Graphics::Graphics(HWND hWnd)
 {
@@ -29,12 +26,16 @@ Graphics::Graphics(HWND hWnd)
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
+	UINT creationFlags = 0;
+#if defined(_DEBUG)
+	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 	HRESULT hr;
-	GRAPHICS_THROW_FAILED(D3D11CreateDeviceAndSwapChain(
+	GRAPHICS_THROW_INFO(D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		0,
+		creationFlags,
 		nullptr,
 		0,
 		D3D11_SDK_VERSION,
@@ -46,8 +47,8 @@ Graphics::Graphics(HWND hWnd)
 	));
 
 	wrl::ComPtr<ID3D11Resource> pBackBuffer;
-	GRAPHICS_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
-	GRAPHICS_THROW_FAILED(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget));
+	GRAPHICS_THROW_INFO(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
+	GRAPHICS_THROW_INFO(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget));
 }
 
 void Graphics::FlipBuffer()
@@ -61,7 +62,7 @@ void Graphics::FlipBuffer()
 		}
 		else
 		{
-			GRAPHICS_THROW_FAILED(hr);
+			GRAPHICS_THROW_INFO(hr);
 		}
 	}
 	
@@ -71,6 +72,49 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
+}
+
+Microsoft::WRL::ComPtr<ID3D11Device> Graphics::GetpDevice()
+{
+	return pDevice;
+}
+
+void Graphics::drawTriangle()
+{
+	namespace wrl = Microsoft::WRL;
+
+	struct Vertex
+	{
+		float x;
+		float y;
+	};
+
+	//make buffer
+	const Vertex vertices[] =
+	{
+		{ 0.0f, 0.5f },
+		{ 0.5f, -0.5f },
+		{ -0.5f, -0.5f }
+	};
+
+	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
+	D3D11_BUFFER_DESC bd = {};
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.CPUAccessFlags = 0u;
+	bd.MiscFlags = 0u;
+	bd.ByteWidth = sizeof(vertices);
+	bd.StructureByteStride = sizeof(Vertex);
+	D3D11_SUBRESOURCE_DATA sd = {};
+	sd.pSysMem = vertices;
+	
+	//bind
+	HRESULT hr;
+	GRAPHICS_THROW_INFO(pDevice->CreateBuffer(&bd, &sd, &pVertexBuffer));
+	const UINT stride = sizeof(Vertex);
+	const UINT offset = 0u;
+	pContext->IASetVertexBuffers(0u, 1u, &pVertexBuffer, &stride, &offset);
+	pContext->Draw(3u, 0u);
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) 
@@ -144,7 +188,8 @@ const char* Graphics::InfoException::what() const
 {
 	std::ostringstream oss;
 	oss << GetType() << " generated " << GetErrorInfo()
-		<< " caused by " << GetOriginString() << std::endl;
+		<< " caused by " << GetOriginString() << std::endl
+		<< info << std::endl;
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }

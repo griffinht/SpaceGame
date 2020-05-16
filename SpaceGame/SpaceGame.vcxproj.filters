@@ -30,6 +30,9 @@
     <ClCompile Include="EngineException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DXGiInfoManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
@@ -42,6 +45,15 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="EngineException.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsThrowMacros.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowThrowMacros.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXGiInfoManager.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

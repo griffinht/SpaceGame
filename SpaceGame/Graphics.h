@@ -5,6 +5,7 @@
 #include <d3d11.h>
 #include <vector>
 #include <wrl.h>
+#include "DXGIInfoManager.h"
 
 class Graphics
 {
@@ -13,12 +14,14 @@ public:
 	~Graphics() = default;
 	void FlipBuffer();
 	void ClearBuffer(float red, float green, float blue);
+	Microsoft::WRL::ComPtr<ID3D11Device> GetpDevice();
+	void drawTriangle();
 private:
+	DxgiInfoManager infoManager;
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
-
 public:
 	class Exception : public EngineException
 	{
