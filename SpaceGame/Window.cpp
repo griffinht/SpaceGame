@@ -63,8 +63,8 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	std::stringstream ss;
 
 	ss << msg;
-	OutputDebugString(ss.str().c_str());
-	OutputDebugString("\n");
+	//OutputDebugString(ss.str().c_str());
+	//OutputDebugString("\n");
 
 	switch (msg)
 	{
