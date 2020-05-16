@@ -32,8 +32,9 @@ void Engine::Draw(float dt)
 		window.Graphics().drawTriangle();
 		window.Graphics().FlipBuffer();
 	}
-	catch (EngineException e)
+	catch (EngineException& e)
 	{
+		OutputDebugString("Fatal Exception, terminating\n");
 		OutputDebugString(e.what());
 		PostQuitMessage(-1);
 	}

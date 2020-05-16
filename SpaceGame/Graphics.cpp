@@ -74,11 +74,6 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
-Microsoft::WRL::ComPtr<ID3D11Device> Graphics::GetpDevice()
-{
-	return pDevice;
-}
-
 void Graphics::drawTriangle()
 {
 	namespace wrl = Microsoft::WRL;
