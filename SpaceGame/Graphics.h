@@ -20,7 +20,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 
 public:
-	class HrException : public EngineException
+	class Exception : public EngineException
+	{
+		using EngineException::EngineException;
+	};
+	class HrException : public Exception
 	{
 	public:
 		HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages = {});
@@ -40,7 +44,7 @@ public:
 		const char* GetType() const override;
 	};
 
-	class InfoException : public EngineException
+	class InfoException : public Exception
 	{
 	public:
 		InfoException(int line, const char* file, std::vector<std::string> infoMessages);

@@ -1,6 +1,9 @@
 #include "Window.h"
 #include <sstream>
 
+#define WINDOW_LAST_EXCEPTION() Window::HrException(__LINE__, __FILE__, GetLastError())
+#define WINDOW_NOGRAPHICS_EXCEPTION() Window::NoGraphicsException(__LINE__, __FILE__)
+
 Window::Window(const char* name)
 {
 	hInstance = GetModuleHandle(nullptr);
@@ -31,6 +34,11 @@ Window::Window(const char* name)
 		nullptr, nullptr, hInstance, nullptr
 	);
 
+	if (hWnd == nullptr)
+	{
+		throw WINDOW_LAST_EXCEPTION();
+	}
+
 	ShowWindow(hWnd, SW_SHOW);
 
 	pGraphics = std::make_unique<::Graphics>(hWnd);
@@ -45,6 +53,10 @@ Window::~Window()
 
 Graphics& Window::Graphics()
 {
+	if (!pGraphics)
+	{
+		throw WINDOW_NOGRAPHICS_EXCEPTION();
+	}
 	return *pGraphics;
 }
 
@@ -75,4 +87,59 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+std::string Window::Exception::TranslateErrorCode(HRESULT hr)
+{
+	char* pMessageBuffer = nullptr;
+	const DWORD nMessageLength = FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPSTR>(&pMessageBuffer), 0, nullptr
+	);
+
+	if (nMessageLength == 0)
+	{
+		return "Unknown Error";
+	}
+
+	std::string error = pMessageBuffer;
+	LocalFree(pMessageBuffer);
+	return error;
+}
+
+Window::HrException::HrException(int line, const char* file, HRESULT hr)
+	:
+	Exception(line, file),
+	hr(hr)
+{}
+
+const char* Window::HrException::what() const
+{
+	std::ostringstream oss;
+	oss << GetType() << " generated error code " << std::hex << std::uppercase << GetErrorCode()
+		<< " caused by " << GetOriginString() << std::endl;
+	whatBuffer = oss.str();
+	return whatBuffer.c_str();
+}
+
+const char* Window::HrException::GetType() const
+{
+	return "Window Exception";
+}
+
+HRESULT Window::HrException::GetErrorCode() const
+{
+	return hr;
+}
+
+std::string Window::HrException::GetErrorDescription() const
+{
+	return Exception::TranslateErrorCode(hr);
+}
+
+
+const char* Window::NoGraphicsException::GetType() const
+{
+	return "Window Exception [No Graphics]";
 }

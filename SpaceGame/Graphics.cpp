@@ -1,5 +1,6 @@
 #include "Graphics.h"
 #include <sstream>
+#include "Window.h"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -72,8 +73,9 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
-Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) :
-	EngineException(line, file),
+Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) 
+	:
+	Exception(line, file),
 	hr(hr)
 {
 	for (const auto& msg : infoMessages)
@@ -124,7 +126,7 @@ const char* Graphics::DeviceRemovedException::GetType() const
 }
 Graphics::InfoException::InfoException(int line, const char* file, std::vector<std::string> infoMessages)
 	:
-	EngineException(line, file)
+	Exception(line, file)
 {
 	for (const auto& message : infoMessages)
 	{
