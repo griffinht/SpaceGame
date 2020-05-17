@@ -49,9 +49,6 @@ void Engine::UpdateLoop()
 			OutputDebugString("TICKING: ");
 			OutputDebugString(std::to_string(tick).c_str());
 			last = now;
-			OutputDebugString(",");
-			OutputDebugString(std::to_string(1000 / dt).c_str());
-			OutputDebugString("\n");
 			{
 				std::lock_guard<std::mutex> guard(mutex);
 				tick++;
@@ -89,7 +86,7 @@ void Engine::RenderLoop()
 			try {
 				window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
 				window.Graphics().drawTriangle(time / 60);//60 is a random constant i think
-				window.Graphics().FlipBuffer();//this waits for vsync
+				window.Graphics().FlipBuffer();//this waits for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
 			}
 			catch (Graphics::InfoException & e)
 			{
