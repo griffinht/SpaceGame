@@ -52,7 +52,7 @@ void Engine::ControlLoop()
 		float dtTick = std::chrono::duration<float, std::milli>(now - lastTick).count();
 		if (dtTick > tickTime)
 		{
-			Tick(ticks++, dtTick)
+			Tick(ticks++, dtTick);
 			lastTick = now;
 			dtTick = 0;
 		}
