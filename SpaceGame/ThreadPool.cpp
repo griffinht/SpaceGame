@@ -22,9 +22,12 @@ ThreadPool::~ThreadPool()
 void ThreadPool::QueueJob(std::function<void(void)> function)
 {
     std::unique_lock<std::mutex> uniqueLock(mutex);
-    while (jobs.size() > queueLimit)
+    if (queueLimit > 0)
     {
-        jobs.pop();
+        while (jobs.size() > queueLimit)
+        {
+            jobs.pop();
+        }
     }
     jobs.emplace(std::move(function));
     condVar.notify_one();
