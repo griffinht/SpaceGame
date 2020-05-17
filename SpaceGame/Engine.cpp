@@ -8,7 +8,19 @@ Engine::Engine()
 	updateThread(&Engine::UpdateLoop, this),
 	renderThread(&Engine::RenderLoop, this)
 {
-
+	while (true)
+	{
+		MSG msg;
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+			{
+				std::exit((int)msg.wParam);
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
 }
 
 Engine::~Engine()
@@ -22,28 +34,17 @@ void Engine::UpdateLoop()
 	auto last = std::chrono::steady_clock::now();
 	while (running)
 	{
-		MSG msg;
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		auto now = std::chrono::steady_clock::now();
+		double dt = std::chrono::duration<double, std::milli>(now - last).count();//todo double or float?
+		if (dt > tickTime)
 		{
-			if (msg.message == WM_QUIT)
-			{
-				std::exit((int)msg.wParam);
-			}
-			TranslateMessage(&msg); //optional, remove?
-			DispatchMessage(&msg);
+			std::lock_guard<std::mutex> locker(mutex);
+			last = now;
+			tick++;
+			//do tick here
 		}
-		else
-		{
-			auto now = std::chrono::steady_clock::now();
-			double dt = std::chrono::duration<double, std::milli>(now - last).count();//todo double or float?
-			if (dt > tickTime)
-			{
-				last = now;
-				tick++;
-				//do tick here, don't forget to lock render thread i think
-			}
-			//Sleep(0);
-		}
+		//Sleep(0);
+		
 	}
 }
 
@@ -58,6 +59,9 @@ void Engine::RenderLoop()
 		
 		if (1000 / dt <= maxFrameRate)
 		{
+			std::lock_guard<std::mutex> locker(mutex);
+			last = now;
+			frame++;//unused
 			OutputDebugString("fps:");
 			OutputDebugString(std::to_string(1000 / dt).c_str());
 			OutputDebugString("\r");
@@ -77,8 +81,7 @@ void Engine::RenderLoop()
 				OutputDebugString(e.what());
 				PostQuitMessage(-1);
 			}
-			last = now;
-			frame++;//unused
 		}
+		Sleep(0);
 	}
 }
