@@ -45,13 +45,11 @@ void Engine::UpdateLoop()
 		double dt = std::chrono::duration<double, std::milli>(now - last).count();//todo double or float?
 		if (dt > tickTime)
 		{
-			mutex.lock();//lock guard here?
+			std::unique_lock<std::mutex> unique(mutex);
 			last = now;
 			ticks++;
 			OutputDebugString("ticking\n");
-			mutex.unlock();
 		}
-		//Sleep(0);
 	}
 }
 
@@ -66,7 +64,7 @@ void Engine::RenderLoop()
 		
 		if (1000 / dt <= maxFrameRate)
 		{
-			mutex.lock();
+			std::unique_lock<std::mutex> unique(mutex);//consider not locking if we can get everything (variables and stuff) we need then do the heavy duty gpu functions
 			last = now;
 			frames++;//unused
 			OutputDebugString("tick:");
@@ -79,19 +77,17 @@ void Engine::RenderLoop()
 			try {
 				window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
 				window.Graphics().drawTriangle(time / 60);//60 is a random constant i think
-				mutex.unlock();
+				unique.unlock();//must unlock before waiting to flip the buffer
 				window.Graphics().FlipBuffer();
 			}
 			catch (Graphics::InfoException & e)
 			{
-				mutex.unlock();
 				window.SetTitle(e.what());
 				OutputDebugString("Nonfatal Engine Error:");
 				OutputDebugString(e.what());
 			}
 			catch (EngineException & e)
 			{
-				mutex.unlock();
 				window.SetTitle(e.what());
 				OutputDebugString("Fatal Engine Error: ");
 				OutputDebugString(e.what());
