@@ -8,19 +8,22 @@ Engine::Engine()
 {
 	updateThread = std::thread(&Engine::UpdateLoop, this);
 	renderThread = std::thread(&Engine::RenderLoop, this);
-	while (true)
+	MSG msg;
+	bool result;
+	while ((result = GetMessage(&msg, nullptr, 0, 0)) != 0)
 	{
-		MSG msg;
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		if (result == -1)
 		{
-			if (msg.message == WM_QUIT)
-			{
-				std::exit((int)msg.wParam);
-			}
+			OutputDebugString("Error -1 in windows message");
+			std::exit((int)msg.wParam);
+		}
+		else
+		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 	}
+	std::exit(msg.wParam);
 }
 
 Engine::~Engine()
