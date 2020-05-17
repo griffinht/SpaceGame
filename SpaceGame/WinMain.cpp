@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include <sstream>
+#include <thread>
 
 int CALLBACK WinMain(
 	HINSTANCE hInstance,
