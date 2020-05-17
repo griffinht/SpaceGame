@@ -43,7 +43,7 @@ void Engine::UpdateLoop()
 	while (running)
 	{
 		auto now = std::chrono::steady_clock::now();
-		double dt = std::chrono::duration<double, std::milli>(now - last).count();//todo double or float?
+		double dt = std::chrono::duration<double, std::milli>(now - last).count();
 		if (dt > tickTime)
 		{
 			OutputDebugString("TICKING: ");
