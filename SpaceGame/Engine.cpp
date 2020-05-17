@@ -10,8 +10,6 @@ Engine::Engine()
 	updateThread(&Engine::UpdateLoop, this)
 {
 	start.notify_all();
-	//renderThread = std::thread(&Engine::RenderLoop, this);
-	//updateThread = std::thread(&Engine::UpdateLoop, this);
 	
 	MSG msg;
 	bool result;
@@ -43,9 +41,10 @@ Engine::~Engine()
 
 void Engine::UpdateLoop()
 {
-	std::unique_lock<std::mutex> a(mutex);
-	start.wait(a);
-	a.unlock();
+	{
+		std::unique_lock<std::mutex> startLock(mutex);
+		start.wait(startLock);
+	}
 	auto last = std::chrono::steady_clock::now();
 	while (running)
 	{
@@ -67,9 +66,10 @@ void Engine::UpdateLoop()
 
 void Engine::RenderLoop()
 {
-	std::unique_lock<std::mutex> a(mutex);
-	start.wait(a);
-	a.unlock();
+	{
+		std::unique_lock<std::mutex> startLock(mutex);
+		start.wait(startLock);
+	}
 	auto last = std::chrono::steady_clock::now();
 	while (running)
 	{
