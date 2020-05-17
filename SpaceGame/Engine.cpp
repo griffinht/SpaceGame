@@ -1,13 +1,17 @@
 #include "Engine.h"
 #include <chrono>
 #include <thread>
+#include <condition_variable>
 
 Engine::Engine()
 	:
-	window("SpaceGame")
+	window("SpaceGame"),
+	renderThread(&Engine::RenderLoop, this),
+	updateThread(&Engine::UpdateLoop, this)
 {
-	renderThread = std::thread(&Engine::RenderLoop, this);//todo move these up there?
-	updateThread = std::thread(&Engine::UpdateLoop, this);
+	start.notify_all();
+	//renderThread = std::thread(&Engine::RenderLoop, this);
+	//updateThread = std::thread(&Engine::UpdateLoop, this);
 	
 	MSG msg;
 	bool result;
@@ -39,6 +43,9 @@ Engine::~Engine()
 
 void Engine::UpdateLoop()
 {
+	std::unique_lock<std::mutex> a(mutex);
+	start.wait(a);
+	a.unlock();
 	auto last = std::chrono::steady_clock::now();
 	while (running)
 	{
@@ -60,6 +67,9 @@ void Engine::UpdateLoop()
 
 void Engine::RenderLoop()
 {
+	std::unique_lock<std::mutex> a(mutex);
+	start.wait(a);
+	a.unlock();
 	auto last = std::chrono::steady_clock::now();
 	while (running)
 	{

@@ -2,6 +2,7 @@
 
 #include "Window.h"
 #include <mutex>
+#include <condition_variable>
 
 class Engine
 {
@@ -12,6 +13,7 @@ public:
 	void UpdateLoop();
 	void RenderLoop();
 private:
+	std::condition_variable start;
 	std::mutex mutex;
 	std::thread updateThread;
 	std::thread renderThread;
