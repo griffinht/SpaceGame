@@ -64,7 +64,7 @@ void Engine::RenderLoop()
 		double dt = std::chrono::duration<double, std::milli>(now - last).count();//delta time since last frame
 		double time = ticks + ((double)dt / tickTime);//interpolated tick
 		
-		if (1000 / dt <= maxFrameRate && std::chrono::duration<double, std::milli>(now - lastUpdate).count() > tickTime) //check if exceeds max framerate and check if a tick is about to happen, in that case don't go
+		if (1000 / dt <= maxFrameRate && std::chrono::duration<double, std::milli>(now - lastUpdate).count() < tickTime) //check if exceeds max framerate and check if a tick is about to happen, in that case don't go
 		{//draw right before a tick causes synchronization and stuttering problems when the update rate and refresh rate match
 			std::unique_lock<std::mutex> unique(mutex);//consider not locking if we can get everything (variables and stuff) we need then do the heavy duty gpu functions
 			last = now;
