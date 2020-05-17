@@ -8,7 +8,7 @@
 class ThreadPool
 {
 public:
-	ThreadPool(int threads);
+	ThreadPool(int threads, int queueLimit);
 	~ThreadPool();
 	void QueueJob(std::function <void(void)> function);
 private:
@@ -17,6 +17,7 @@ private:
 	std::queue <std::function <void(void)>> jobs;
 	std::vector <std::thread> threads;
 	bool shutdown = false;
+	int queueLimit;
 protected:
 	void ThreadEntry(int i);
 };

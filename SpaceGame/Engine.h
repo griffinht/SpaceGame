@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.h"
+#include "ThreadPool.h"
 #include <mutex>
 #include <condition_variable>
 
@@ -17,8 +18,12 @@ private:
 	std::mutex mutex;
 	bool rendering = false;
 	std::thread controlThread;
+	std::thread renderThread;
+	std::mutex renderMutex;
+	std::condition_variable renderCondVar;
 private:
 	Window window;
+	ThreadPool threadPool;
 	bool running = true;
 private:
 	const float maxFrameRate = 666;

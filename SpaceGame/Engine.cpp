@@ -5,7 +5,8 @@
 
 Engine::Engine()
 	:
-	window("SpaceGame")
+	window("SpaceGame"),
+	threadPool(1, 1)
 {
 	controlThread = std::thread(&Engine::ControlLoop, this);
 
@@ -61,7 +62,7 @@ void Engine::ControlLoop()
 		if (dtRender >= maxFrameTime)
 		{
 			frames++;
-			Render(ticks + (dtTick / tickTime), dtRender);
+			threadPool.QueueJob([this, ticks, dtTick, dtRender]() {Render(ticks + (dtTick / tickTime), dtRender);});
 			lastRender = now;
 		}
 	}
