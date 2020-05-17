@@ -45,10 +45,11 @@ void Engine::UpdateLoop()
 		double dt = std::chrono::duration<double, std::milli>(now - last).count();//todo double or float?
 		if (dt > tickTime)
 		{
-			std::lock_guard<std::mutex> locker(mutex);
+			mutex.lock();//lock guard here?
 			last = now;
-			tick++;
-			//do tick here
+			ticks++;
+			OutputDebugString("ticking\n");
+			mutex.unlock();
 		}
 		//Sleep(0);
 	}
@@ -61,31 +62,36 @@ void Engine::RenderLoop()
 	{
 		auto now = std::chrono::steady_clock::now();
 		double dt = std::chrono::duration<double, std::milli>(now - last).count();//delta time since last frame
-		double time = tick + ((double)dt / tickTime);//interpolated tick
+		double time = ticks + ((double)dt / tickTime);//interpolated tick
 		
 		if (1000 / dt <= maxFrameRate)
 		{
-			OutputDebugString("RENDERING");//the whole render doesn't work without line for whatever reason
-			std::lock_guard<std::mutex> locker(mutex);
-			OutputDebugString("render mutex clear");
+			mutex.lock();
 			last = now;
-			frame++;//unused
+			frames++;//unused
+			OutputDebugString("tick:");
+			OutputDebugString(std::to_string(ticks).c_str());
+			OutputDebugString(", animate:");
+			OutputDebugString(std::to_string(time / 60).c_str());
 			OutputDebugString("fps:");
 			OutputDebugString(std::to_string(1000 / dt).c_str());
-			OutputDebugString("\r");
+			OutputDebugString("\n");
 			try {
 				window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
-				window.Graphics().drawTriangle((time) / 60);//60 is a random constant i think
+				window.Graphics().drawTriangle(time / 60);//60 is a random constant i think
+				mutex.unlock();
 				window.Graphics().FlipBuffer();
 			}
 			catch (Graphics::InfoException & e)
 			{
+				mutex.unlock();
 				window.SetTitle(e.what());
 				OutputDebugString("Nonfatal Engine Error:");
 				OutputDebugString(e.what());
 			}
 			catch (EngineException & e)
 			{
+				mutex.unlock();
 				window.SetTitle(e.what());
 				OutputDebugString("Fatal Engine Error: ");
 				OutputDebugString(e.what());
