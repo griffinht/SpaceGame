@@ -72,16 +72,18 @@ void Engine::RenderLoop()
 		if (1000 / dt <= maxFrameRate)
 		{
 			last = now;
+			int t;
 			{
 				std::lock_guard<std::mutex> guard(mutex);
 				frame++;//unused
+				t = tick;
 				//todo get all variables and stuff needed for draw
 			}
-			OutputDebugString("DRAWING:tick:");
-			OutputDebugString(std::to_string(tick).c_str());
+			OutputDebugString("DRAWING: ");
+			OutputDebugString(std::to_string(t).c_str());
 			//OutputDebugString(", animate:");
 			//OutputDebugString(std::to_string(time / 60).c_str());
-			OutputDebugString("fps:");
+			OutputDebugString(",");
 			OutputDebugString(std::to_string(1000 / dt).c_str());
 			OutputDebugString("\n");
 			try {
