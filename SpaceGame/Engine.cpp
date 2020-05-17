@@ -46,11 +46,15 @@ void Engine::UpdateLoop()
 		double dt = std::chrono::duration<double, std::milli>(now - last).count();//todo double or float?
 		if (dt > tickTime)
 		{
-			OutputDebugString("TICKING\n");
+			OutputDebugString("TICKING: ");
+			OutputDebugString(std::to_string(tick).c_str());
 			last = now;
+			OutputDebugString(",");
+			OutputDebugString(std::to_string(1000 / dt).c_str());
+			OutputDebugString("\n");
 			{
 				std::lock_guard<std::mutex> guard(mutex);
-				ticks++;
+				tick++;
 				//todo tick here
 			}
 		}
@@ -64,19 +68,19 @@ void Engine::RenderLoop()
 	{
 		auto now = std::chrono::steady_clock::now();
 		double dt = std::chrono::duration<double, std::milli>(now - last).count();//delta time since last frame
-		double time = ticks + ((double)dt / tickTime);//interpolated tick
+		double time = tick + ((double)dt / tickTime);//interpolated tick
 		if (1000 / dt <= maxFrameRate)
 		{
 			last = now;
 			{
 				std::lock_guard<std::mutex> guard(mutex);
-				frames++;//unused
+				frame++;//unused
 				//todo get all variables and stuff needed for draw
 			}
 			OutputDebugString("DRAWING:tick:");
-			OutputDebugString(std::to_string(ticks).c_str());
-			OutputDebugString(", animate:");
-			OutputDebugString(std::to_string(time / 60).c_str());
+			OutputDebugString(std::to_string(tick).c_str());
+			//OutputDebugString(", animate:");
+			//OutputDebugString(std::to_string(time / 60).c_str());
 			OutputDebugString("fps:");
 			OutputDebugString(std::to_string(1000 / dt).c_str());
 			OutputDebugString("\n");

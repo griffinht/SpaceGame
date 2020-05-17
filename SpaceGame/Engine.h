@@ -18,8 +18,8 @@ private:
 private:
 	Window window;
 	bool running = true;
-	int ticks = 0;
-	int frames = 0;
+	int tick = 0;
+	int frame = 0;
 private:
 	const float maxFrameRate = 666;
 	const float tickRate = 60;
