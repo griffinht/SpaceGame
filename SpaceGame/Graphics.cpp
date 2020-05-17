@@ -22,10 +22,10 @@ Graphics::Graphics(HWND hWnd)
 	sd.SampleDesc.Count = 1; //aa
 	sd.SampleDesc.Quality = 0;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.BufferCount = 1; //buffering
+	sd.BufferCount = 2; //buffering
 	sd.OutputWindow = hWnd;
 	sd.Windowed = TRUE;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	sd.Flags = 0;
 
 	UINT creationFlags = 0;

@@ -4,10 +4,10 @@
 
 Engine::Engine()
 	:
-	window("SpaceGame"),
-	updateThread(&Engine::UpdateLoop, this),
-	renderThread(&Engine::RenderLoop, this)
+	window("SpaceGame")
 {
+	updateThread = std::thread(&Engine::UpdateLoop, this);
+	renderThread = std::thread(&Engine::RenderLoop, this);
 	while (true)
 	{
 		MSG msg;
@@ -44,7 +44,6 @@ void Engine::UpdateLoop()
 			//do tick here
 		}
 		//Sleep(0);
-		
 	}
 }
 
@@ -59,7 +58,9 @@ void Engine::RenderLoop()
 		
 		if (1000 / dt <= maxFrameRate)
 		{
+			OutputDebugString("RENDERING");//the whole render doesn't work without line for whatever reason
 			std::lock_guard<std::mutex> locker(mutex);
+			OutputDebugString("render mutex clear");
 			last = now;
 			frame++;//unused
 			OutputDebugString("fps:");
