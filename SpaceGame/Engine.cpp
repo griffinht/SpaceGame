@@ -6,7 +6,7 @@ Engine::Engine()
 	:
 	window("SpaceGame")
 {
-	renderThread = std::thread(&Engine::RenderLoop, this);
+	renderThread = std::thread(&Engine::RenderLoop, this);//todo move these up there?
 	updateThread = std::thread(&Engine::UpdateLoop, this);
 	
 	MSG msg;
