@@ -23,11 +23,15 @@ Engine::Engine()
 			DispatchMessage(&msg);
 		}
 	}
+	running = false;
+	updateThread.join();
+	renderThread.join();
 	std::exit(msg.wParam);
 }
 
 Engine::~Engine()
 {
+	running = false;
 	updateThread.join();
 	renderThread.join();
 }
