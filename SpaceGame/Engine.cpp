@@ -52,17 +52,17 @@ void Engine::ControlLoop()
 		float dtTick = std::chrono::duration<float, std::milli>(now - lastTick).count();
 		if (dtTick > tickTime)
 		{
+			Tick(ticks++, dtTick)
 			lastTick = now;
-			Tick(ticks++, dtTick);
 			dtTick = 0;
 		}
 
 		float dtRender = std::chrono::duration<float, std::milli>(now - lastRender).count();
 		if (dtRender >= maxFrameTime)
 		{
-			lastRender = now;
 			frames++;
 			Render(ticks + (dtTick / tickTime), dtRender);
+			lastRender = now;
 		}
 	}
 }
