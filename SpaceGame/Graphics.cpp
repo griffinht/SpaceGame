@@ -105,7 +105,7 @@ void Graphics::drawTriangle(float angle)
 		{ -0.5f,-0.5f,0,0,255,0 },
 		{ -0.3f,0.3f,0,255,0,0 },
 		{ 0.3f,0.3f,0,0,255,0 },
-		{ 0.0f,-0.8f,255,0,0,0 },
+		{ 0.0f,-1.0f,255,0,0,0 },
 	};
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
@@ -159,9 +159,9 @@ void Graphics::drawTriangle(float angle)
 	};
 	const ConstantBuffer cb =
 	{
-		{
-			std::cos(angle), std::sin(angle), 0.0f, 0.0f,
-			-std::sin(angle), std::cos(angle), 0.0f, 0.0f,
+		{//todo replace with actual aspect ratio
+			(9.0f / 16.0f) * std::cos(angle), std::sin(angle), 0.0f, 0.0f,
+			(9.0f / 16.0f) * -std::sin(angle), std::cos(angle), 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f,
 		}

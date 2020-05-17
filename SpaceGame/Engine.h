@@ -9,22 +9,21 @@ class Engine
 public:
 	Engine();
 	~Engine();
-public:
-	void UpdateLoop();
-	void RenderLoop();
 private:
-	std::condition_variable start;
+	void ControlLoop();
+	void Tick(int tick, float dt);
+	void Render(float tick, float dt);
+private:
 	std::mutex mutex;
-	std::thread updateThread;
-	std::thread renderThread;
+	bool rendering = false;
+	std::thread controlThread;
 private:
 	Window window;
 	bool running = true;
-	int tick = 0;
-	int frame = 0;
 private:
 	const float maxFrameRate = 666;
+	const float maxFrameTime = 1000.0f / maxFrameRate;
 	const float tickRate = 60;
-	const double tickTime = 1000.0 / tickRate; // how long each tick takes in miliseconds
+	const float tickTime = 1000.0f / tickRate; // how long each tick takes in miliseconds
 	const bool vSync = true;
 };
