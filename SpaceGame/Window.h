@@ -12,6 +12,7 @@ public:
 	Window(const char* name);
 	~Window();
 	Graphics& Graphics();
+	void SetTitle(const char* name);
 private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	const LPCSTR CLASS_NAME = "SpaceGame Class Thing";

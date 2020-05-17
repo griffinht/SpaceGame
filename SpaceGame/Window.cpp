@@ -58,6 +58,11 @@ Graphics& Window::Graphics()
 	return *pGraphics;
 }
 
+void Window::SetTitle(const char* name)
+{
+	SetWindowText(hWnd, name);
+}
+
 LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	std::stringstream ss;

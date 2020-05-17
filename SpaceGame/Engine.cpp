@@ -80,11 +80,13 @@ void Engine::RenderLoop()
 			}
 			catch (Graphics::InfoException & e)
 			{
+				window.SetTitle(e.what());
 				OutputDebugString("Nonfatal Engine Error:");
 				OutputDebugString(e.what());
 			}
 			catch (EngineException & e)
 			{
+				window.SetTitle(e.what());
 				OutputDebugString("Fatal Engine Error: ");
 				OutputDebugString(e.what());
 				PostQuitMessage(-1);
