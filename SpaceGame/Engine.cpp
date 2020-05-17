@@ -70,6 +70,8 @@ void Engine::Tick(int tick, float dt)
 {
 	OutputDebugString("TICKING: ");
 	OutputDebugString(std::to_string(tick).c_str());
+	OutputDebugString(", tps: ");
+	OutputDebugString(std::to_string(1000.0f / dt).c_str());
 	OutputDebugString("\n");
 	std::unique_lock<std::mutex> uniqueLock(mutex);
 	//todo tick here

@@ -166,6 +166,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="EngineException.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -175,6 +176,7 @@
     <ClInclude Include="EngineException.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="GraphicsThrowMacros.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowThrowMacros.h" />
   </ItemGroup>
