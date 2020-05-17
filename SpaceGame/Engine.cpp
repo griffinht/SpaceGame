@@ -39,18 +39,20 @@ Engine::~Engine()
 
 void Engine::UpdateLoop()
 {
-	lastUpdate = std::chrono::steady_clock::now();
+	auto last = std::chrono::steady_clock::now();
 	while (running)
 	{
 		auto now = std::chrono::steady_clock::now();
-		double dt = std::chrono::duration<double, std::milli>(now - lastUpdate).count();//todo double or float? also does this need to be locked
+		double dt = std::chrono::duration<double, std::milli>(now - last).count();//todo double or float?
 		if (dt > tickTime)
 		{
-			std::unique_lock<std::mutex> unique(mutex);
-			lastUpdate = now;
-			ticks++;
 			OutputDebugString("TICKING\n");
-			unique.unlock();
+			last = now;
+			{
+				std::lock_guard<std::mutex> guard(mutex);
+				ticks++;
+				//todo tick here
+			}
 		}
 	}
 }
@@ -63,14 +65,14 @@ void Engine::RenderLoop()
 		auto now = std::chrono::steady_clock::now();
 		double dt = std::chrono::duration<double, std::milli>(now - last).count();//delta time since last frame
 		double time = ticks + ((double)dt / tickTime);//interpolated tick
-		
-		if (1000 / dt <= maxFrameRate && std::chrono::duration<double, std::milli>(now - lastUpdate).count() < tickTime) //check if exceeds max framerate and check if a tick is about to happen, in that case don't go
-		{//draw right before a tick causes synchronization and stuttering problems when the update rate and refresh rate match
-			std::unique_lock<std::mutex> unique(mutex);//consider not locking if we can get everything (variables and stuff) we need then do the heavy duty gpu functions
+		if (1000 / dt <= maxFrameRate)
+		{
 			last = now;
-			frames++;//unused
-			//todo get all variables and stuff needed for draw
-			unique.unlock();
+			{
+				std::lock_guard<std::mutex> guard(mutex);
+				frames++;//unused
+				//todo get all variables and stuff needed for draw
+			}
 			OutputDebugString("DRAWING:tick:");
 			OutputDebugString(std::to_string(ticks).c_str());
 			OutputDebugString(", animate:");
@@ -81,7 +83,7 @@ void Engine::RenderLoop()
 			try {
 				window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
 				window.Graphics().drawTriangle(time / 60);//60 is a random constant i think
-				window.Graphics().FlipBuffer();
+				window.Graphics().FlipBuffer();//this waits for vsync
 			}
 			catch (Graphics::InfoException & e)
 			{
@@ -97,6 +99,5 @@ void Engine::RenderLoop()
 				PostQuitMessage(-1);
 			}
 		}
-		//Sleep(0);
 	}
 }
