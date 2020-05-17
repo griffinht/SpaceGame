@@ -20,6 +20,7 @@ private:
 	bool running = true;
 	int ticks = 0;
 	int frames = 0;
+	std::chrono::steady_clock::time_point lastUpdate;
 private:
 	const float maxFrameRate = 666;
 	const float tickRate = 60;
