@@ -12,9 +12,19 @@ Mouse::Event::Type Mouse::Event::getType()
 	return type;
 }
 
-POINTS Mouse::Event::getMousePosition()
+POINTS Mouse::Event::GetMousePos()
 {
 	return POINTS();
+}
+
+float Mouse::Event::GetMousePosX()
+{
+	return mousePosition.x;
+}
+
+float Mouse::Event::GetMousePosY()
+{
+	return mousePosition.y;
 }
 
 WPARAM Mouse::Event::getWParam() 
@@ -74,16 +84,36 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 	events.push(Mouse::Event::Event(type, wParam, lParam));
 }
 
-POINTS Mouse::GetMousePosition()
+POINTS Mouse::GetMousePos()
 {
 	return mousePosition;
 }
 
-POINTS Mouse::GetMousePositionDelta()
+float Mouse::GetMousePosX()
+{
+	return mousePosition.x;
+}
+
+float Mouse::GetMousePosY()
+{
+	return mousePosition.y;
+}
+
+POINTS Mouse::GetMousePosDelta()
 {
 	POINTS d = mousePositionDelta;
-	mousePosition = POINTS({ 0, 0 });
+	mousePositionDelta = POINTS({ 0, 0 });
 	return d;
+}
+
+float Mouse::GetMousePosDeltaX()
+{
+	return mousePositionDelta.x;
+}
+
+float Mouse::GetMousePosDeltaY()
+{
+	return mousePositionDelta.y;
 }
 
 int Mouse::GetMouseWheelDelta()

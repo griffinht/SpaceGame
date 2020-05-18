@@ -24,7 +24,9 @@ public:
 	public:
 		Event(Type type, WPARAM wParam, LPARAM lParam);
 		Type getType();
-		POINTS getMousePosition();
+		POINTS GetMousePos();
+		float GetMousePosX();
+		float GetMousePosY();
 		WPARAM getWParam();
 	private:
 		Type type;
@@ -34,8 +36,12 @@ public:
 public:
 	Mouse() = default;
 	void OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam);
-	POINTS GetMousePosition();
-	POINTS GetMousePositionDelta();
+	POINTS GetMousePos();
+	float GetMousePosX();
+	float GetMousePosY();
+	POINTS GetMousePosDelta();
+	float GetMousePosDeltaX();
+	float GetMousePosDeltaY();
 	int GetMouseWheelDelta();
 	bool LButtonPressed();
 	bool MButtonPressed();
