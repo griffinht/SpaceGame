@@ -17,18 +17,18 @@ public:
 			LButtonUp,
 			MButtonDown,
 			MButtonUp,
-			MouseWheel,
 			RButtonDown,
-			RButtonUp
+			RButtonUp,
+			MouseWheel
 		};
 	public:
 		Event(Type type, WPARAM wParam, LPARAM lParam);
 		Type getType();
-		POINTS getPoints();
+		POINTS getMousePosition();
 		WPARAM getWParam();
 	private:
 		Type type;
-		POINTS points;
+		POINTS mousePosition;
 		WPARAM wParam;
 	};
 public:
@@ -42,12 +42,13 @@ public:
 	bool RButtonPressed();
 private:
 	std::optional<Mouse::Event> GetEvent();
-	POINTS mousePosition;
-	POINTS mousePositionDelta;
-	int mouseWheelDelta;
-	bool lButtonPressed;
-	bool mButtonPressed;
-	bool rButtonPressed;
-private:
+	POINTS mousePosition = POINTS({0, 0});
+	POINTS mousePositionDelta = POINTS({0, 0});
+	int mouseWheelDelta = 0;
+	bool lButtonPressed = false;
+	bool mButtonPressed = false;
+	bool rButtonPressed = false;
 	std::queue<Mouse::Event> events;
+private:
+	static POINTS AddPoints(POINTS p1, POINTS p2);
 };
