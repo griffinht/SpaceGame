@@ -234,7 +234,8 @@ std::optional<Window::Keyboard::Event> Window::Keyboard::GetEvent()
 	{
 		return std::optional<Window::Keyboard::Event>();
 	}
-g	{
+	else
+	{
 		return std::optional<Window::Keyboard::Event>(events.front());
 		events.pop();
 	}
