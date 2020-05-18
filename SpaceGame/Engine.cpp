@@ -11,7 +11,6 @@ Engine::Engine()
 	controlThread = std::thread(&Engine::ControlLoop, this);
 
 	MSG msg;
-	bool result;
 	while (GetMessage(&msg, nullptr, 0, 0) || true)
 	{
 		if (msg.message == WM_QUIT)
@@ -26,7 +25,7 @@ Engine::Engine()
 			DispatchMessage(&msg);
 		}
 	}
-	std::exit(msg.wParam);
+	std::exit((int)msg.wParam);
 }
 
 Engine::~Engine()
@@ -97,7 +96,7 @@ void Engine::Render(float tick, float dt)
 	*/
 	try {
 		window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
-		window.Graphics().drawTriangle(tick / 60);//60 is a random constant i think
+		window.Graphics().drawTriangle(tick / 60, window.Mouse().GetMousePosX, window.Mouse().GetMousePosY);//60 is a random constant i think
 		window.Graphics().FlipBuffer();//this waits for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
 	}
 	catch (Graphics::InfoException & e)

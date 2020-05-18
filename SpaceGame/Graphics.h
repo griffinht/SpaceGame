@@ -14,7 +14,7 @@ public:
 	~Graphics() = default;
 	void FlipBuffer();
 	void ClearBuffer(float red, float green, float blue);
-	void drawTriangle(float angle);
+	void drawTriangle(float angle, float x, float y);
 private:
 	DxgiInfoManager infoManager;
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
