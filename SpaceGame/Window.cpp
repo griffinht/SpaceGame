@@ -7,12 +7,12 @@ Window::Window(const char* name)
 	hInstance = GetModuleHandle(nullptr);
 
 	// window class
-	WNDCLASSEX wc = { 0 };
+	WNDCLASSEX wc;
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC;
-	wc.lpfnWndProc = WndProc;
+	wc.lpfnWndProc = &Window::StaticWndProc;
 	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
+	wc.cbWndExtra = sizeof(Window*);
 	wc.hInstance = hInstance;
 	wc.hIcon = nullptr;
 	wc.hCursor = nullptr;
@@ -23,13 +23,13 @@ Window::Window(const char* name)
 	wc.hIconSm = nullptr;
 	RegisterClassEx(&wc);
 
-	// window instance
+	//window instance
 	hWnd = CreateWindowEx(
 		0, CLASS_NAME,
 		name,
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720,
-		nullptr, nullptr, hInstance, nullptr
+		nullptr, nullptr, hInstance, static_cast<LPVOID>(this)
 	);
 
 	if (hWnd == nullptr)
@@ -63,6 +63,19 @@ void Window::SetTitle(const char* name)
 	SetWindowText(hWnd, name);
 }
 
+LRESULT Window::StaticWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (msg == WM_NCCREATE)
+	{
+		CREATESTRUCT* pCS = reinterpret_cast<CREATESTRUCT*>(lParam);
+		LPVOID pThis = pCS->lpCreateParams;
+		SetWindowLongPtrW(hWnd, 0, reinterpret_cast<LONG_PTR>(pThis));
+	}
+
+	Window* pWnd = reinterpret_cast<Window*>(GetWindowLongPtrW(hWnd, 0));
+	return pWnd->WndProc(hWnd, msg, wParam, lParam);
+}
+
 LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	std::stringstream ss;
@@ -77,16 +90,22 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		PostQuitMessage(0);
 		break;
 	case WM_KEYDOWN:
+		keyboard.OnEvent(Window::Keyboard::Event::Type::Keydown, wParam, lParam);
 		break;
 	case WM_KEYUP:
+		keyboard.OnEvent(Window::Keyboard::Event::Type::Keyup, wParam, lParam);
 		break;
 	case WM_CHAR:
+		keyboard.OnEvent(Window::Keyboard::Event::Type::Char, wParam, lParam);
 		break;
-	case WM_LBUTTONDOWN: //last click
-		POINTS pt = MAKEPOINTS(lParam);
-		std::ostringstream oss;
-		oss << "(" << pt.x << ", " << pt.y << ")";
-		SetWindowText(hWnd, oss.str().c_str());
+	case WM_MOUSEMOVE:
+		mouse.OnEvent(Window::Mouse::Event::Type::Move, wParam, lParam);
+		break;
+	case WM_LBUTTONDOWN:
+		mouse.OnEvent(Window::Mouse::Event::Type::LButtonDown, wParam, lParam);
+		break;
+	case WM_LBUTTONUP:
+		mouse.OnEvent(Window::Mouse::Event::Type::LButtonUp, wParam, lParam);
 		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -145,4 +164,83 @@ std::string Window::HrException::GetErrorDescription() const
 const char* Window::NoGraphicsException::GetType() const
 {
 	return "Window Exception [No Graphics]";
+}
+
+Window::Mouse::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
+{
+	this->type = type;
+	this->wParam = wParam;
+	this->points = MAKEPOINTS(lParam);
+}
+
+Window::Mouse::Event::Type Window::Mouse::Event::getType()
+{
+	return type;
+}
+
+POINTS Window::Mouse::Event::getPoints()
+{
+	return points;
+}
+
+WPARAM Window::Mouse::Event::getWParam()
+{
+	return wParam;
+}
+
+std::optional<Window::Mouse::Event> Window::Mouse::GetEvent()
+{
+	if (events.empty())
+	{
+		return std::optional<Window::Mouse::Event>();
+	}
+	else
+	{
+		return std::optional<Window::Mouse::Event>(events.front());
+		events.pop();
+	}
+}
+
+void Window::Mouse::OnEvent(Window::Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
+{
+	events.push(Window::Mouse::Event::Event(type, wParam, lParam));
+}
+
+Window::Keyboard::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
+{
+	this->type = type;
+	this->wParam = wParam;
+	this->points = MAKEPOINTS(lParam);
+}
+
+Window::Keyboard::Event::Type Window::Keyboard::Event::getType()
+{
+	return type;
+}
+
+POINTS Window::Keyboard::Event::getPoints()
+{
+	return points;
+}
+
+WPARAM Window::Keyboard::Event::getWParam()
+{
+	return wParam;
+}
+
+std::optional<Window::Keyboard::Event> Window::Keyboard::GetEvent()
+{
+	if (events.empty())
+	{
+		return std::optional<Window::Keyboard::Event>();
+	}
+g	{
+		return std::optional<Window::Keyboard::Event>(events.front());
+		events.pop();
+	}
+}
+
+void Window::Keyboard::OnEvent(Window::Keyboard::Event::Type type, WPARAM wParam, LPARAM lParam)
+{
+	events.push(Window::Keyboard::Event::Event(type, wParam, lParam));
 }
