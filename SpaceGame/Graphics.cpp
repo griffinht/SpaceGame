@@ -162,7 +162,7 @@ void Graphics::drawTriangle(float angle, float x, float y)
 			dx::XMMatrixTranspose(
 				dx::XMMatrixRotationZ(angle) *
 				dx::XMMatrixScaling(9.0f / 16.0f, 1.0f, 1.0f) *
-				dx::XMMatrixTranslation(9.0f / 16.0f, 1.0f, 1.0f)
+				dx::XMMatrixTranslation(9.0f / 16.0f, x, y)
 			)
 		}
 	};

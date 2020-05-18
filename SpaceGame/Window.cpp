@@ -93,22 +93,22 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		PostQuitMessage(0);
 		break;
 	case WM_KEYDOWN:
-		Keyboard().OnEvent(Keyboard::Event::Type::Keydown, wParam, lParam);
+		keyboard.OnEvent(Keyboard::Event::Type::Keydown, wParam, lParam);
 		break;
 	case WM_KEYUP:
-		Keyboard().OnEvent(Keyboard::Event::Type::Keyup, wParam, lParam);
+		keyboard.OnEvent(Keyboard::Event::Type::Keyup, wParam, lParam);
 		break;
 	case WM_CHAR:
-		Keyboard().OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
+		keyboard.OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
 		break;
 	case WM_MOUSEMOVE:
-		Mouse().OnEvent(Mouse::Event::Type::Move, wParam, lParam);
+		mouse.OnEvent(Mouse::Event::Type::Move, wParam, lParam);
 		break;
 	case WM_LBUTTONDOWN:
-		Mouse().OnEvent(Mouse::Event::Type::LButtonDown, wParam, lParam);
+		mouse.OnEvent(Mouse::Event::Type::LButtonDown, wParam, lParam);
 		break;
 	case WM_LBUTTONUP:
-		Mouse().OnEvent(Mouse::Event::Type::LButtonUp, wParam, lParam);
+		mouse.OnEvent(Mouse::Event::Type::LButtonUp, wParam, lParam);
 		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
