@@ -16,9 +16,6 @@ public:
 	~Window();
 	Graphics& Graphics();
 	void SetTitle(const char* name);
-
-
-
 private:
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
