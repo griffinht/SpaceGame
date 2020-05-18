@@ -58,6 +58,16 @@ Graphics& Window::Graphics()
 	return *pGraphics;
 }
 
+Mouse& Window::Mouse()
+{
+	return *mouse;
+}
+
+Keyboard& Window::Keyboard()
+{
+	return *keyboard;
+}
+
 void Window::SetTitle(const char* name)
 {
 	SetWindowText(hWnd, name);
@@ -90,22 +100,22 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		PostQuitMessage(0);
 		break;
 	case WM_KEYDOWN:
-		keyboard.OnEvent(Keyboard::Event::Type::Keydown, wParam, lParam);
+		Keyboard().OnEvent(Keyboard::Event::Type::Keydown, wParam, lParam);
 		break;
 	case WM_KEYUP:
-		keyboard.OnEvent(Keyboard::Event::Type::Keyup, wParam, lParam);
+		Keyboard().OnEvent(Keyboard::Event::Type::Keyup, wParam, lParam);
 		break;
 	case WM_CHAR:
-		keyboard.OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
+		Keyboard().OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
 		break;
 	case WM_MOUSEMOVE:
-		mouse.OnEvent(Mouse::Event::Type::Move, wParam, lParam);
+		Mouse().OnEvent(Mouse::Event::Type::Move, wParam, lParam);
 		break;
 	case WM_LBUTTONDOWN:
-		mouse.OnEvent(Mouse::Event::Type::LButtonDown, wParam, lParam);
+		Mouse().OnEvent(Mouse::Event::Type::LButtonDown, wParam, lParam);
 		break;
 	case WM_LBUTTONUP:
-		mouse.OnEvent(Mouse::Event::Type::LButtonUp, wParam, lParam);
+		Mouse().OnEvent(Mouse::Event::Type::LButtonUp, wParam, lParam);
 		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);

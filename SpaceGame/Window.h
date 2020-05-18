@@ -15,6 +15,8 @@ public:
 	Window(const char* name);
 	~Window();
 	Graphics& Graphics();
+	Mouse& Mouse();
+	Keyboard& Keyboard();
 	void SetTitle(const char* name);
 private:
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -23,8 +25,8 @@ private:
 	HINSTANCE hInstance;
 	HWND hWnd;
 	std::unique_ptr<::Graphics> pGraphics;
-	Mouse mouse;
-	Keyboard keyboard;
+	std::unique_ptr<::Mouse> mouse;
+	std::unique_ptr<::Keyboard> keyboard;
 public:
 	class Exception : public EngineException
 	{
