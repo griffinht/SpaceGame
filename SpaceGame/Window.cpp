@@ -23,13 +23,25 @@ Window::Window(const char* name)
 	wc.hIconSm = nullptr;
 	RegisterClassEx(&wc);
 
+	RECT rect = RECT();
+	rect.left = 0;
+	rect.right = 1280;
+	rect.top = 0;
+	rect.bottom = 720;
+	AdjustWindowRect(&rect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, false);
 	//window instance
 	hWnd = CreateWindowEx(
 		0, CLASS_NAME,
 		name,
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720,
-		nullptr, nullptr, hInstance, static_cast<LPVOID>(this)
+		CW_USEDEFAULT, 
+		CW_USEDEFAULT, 
+		rect.right - rect.left, 
+		rect.bottom - rect.top,
+		nullptr, 
+		nullptr, 
+		hInstance, 
+		static_cast<LPVOID>(this)
 	);
 
 	if (hWnd == nullptr)
