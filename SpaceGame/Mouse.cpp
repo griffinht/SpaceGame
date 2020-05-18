@@ -4,7 +4,7 @@ Mouse::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
 {
 	this->type = type;
 	this->mousePosition = MAKEPOINTS(lParam);
-	this->wParam = wParam;
+	this->wParam = wParam
 }
 
 Mouse::Event::Type Mouse::Event::getType()
@@ -82,6 +82,10 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	events.push(Mouse::Event::Event(type, wParam, lParam));
+	while (maxBufferSize > 0 && events.size() > maxBufferSize)
+	{
+		events.pop();
+	}
 }
 
 POINTS Mouse::GetMousePos()
