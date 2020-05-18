@@ -47,6 +47,9 @@ Window::~Window()
 	UnregisterClass(CLASS_NAME, hInstance);
 
 	DestroyWindow(hWnd);
+
+	delete& mouse;
+	delete& keyboard;
 }
 
 Graphics& Window::Graphics()

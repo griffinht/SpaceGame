@@ -21,8 +21,8 @@ private:
 	std::mutex renderMutex;
 	std::condition_variable renderCondVar;
 private:
-	std::unique_ptr<Window> window = std::unique_ptr<Window>(new Window("SpaceGame"));
-	std::unique_ptr<ThreadPool> threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(1, 1));
+	std::unique_ptr<Window> window = std::make_unique<Window>("SpaceGame");
+	std::unique_ptr<ThreadPool> threadPool = std::make_unique<ThreadPool>(1, 1);
 	bool running = true;
 private:
 	const float maxFrameRate = 666;

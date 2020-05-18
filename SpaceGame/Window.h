@@ -16,8 +16,8 @@ public:
 	~Window();
 	Graphics& Graphics();
 	void SetTitle(const char* name);
-	std::unique_ptr<::Mouse> mouse;
-	std::unique_ptr<::Keyboard> keyboard;
+	Mouse mouse;
+	Keyboard keyboard;
 private:
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

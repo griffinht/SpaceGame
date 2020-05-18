@@ -24,38 +24,39 @@ public:
 	public:
 		Event(Type type, WPARAM wParam, LPARAM lParam);
 		Type getType();
-		POINTS GetMousePos();
-		float GetMousePosX();
-		float GetMousePosY();
+		std::pair<int, int> GetPos();
+		int GetPosX();
+		int GetPosY();
 		WPARAM getWParam();
 	private:
 		Type type;
-		POINTS mousePosition;
+		std::pair<int, int> mousePosition;
 		WPARAM wParam;
 	};
 public:
-	Mouse() = default;
+	Mouse();
 	void OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam);
-	POINTS GetMousePos();
-	float GetMousePosX();
-	float GetMousePosY();
-	POINTS GetMousePosDelta();
-	float GetMousePosDeltaX();
-	float GetMousePosDeltaY();
-	int GetMouseWheelDelta();
+	std::pair<int, int> GetPos();
+	int GetPosX();
+	int GetPosY();
+	std::pair<int, int> GetPosDelta();
+	int GetPosDeltaX();
+	int GetPosDeltaY();
+	int GetWheelDelta();
 	bool LButtonPressed();
 	bool MButtonPressed();
 	bool RButtonPressed();
 private:
 	std::optional<Mouse::Event> GetEvent();
-	POINTS mousePosition = POINTS({0, 0});
-	POINTS mousePositionDelta = POINTS({0, 0});
-	int mouseWheelDelta = 0;
-	bool lButtonPressed = false;
-	bool mButtonPressed = false;
-	bool rButtonPressed = false;
+	std::pair<int, int> mousePosition;
+	std::pair<int, int> mousePositionDelta;
+	int mouseWheelDelta;
+	bool lButtonPressed;
+	bool mButtonPressed;
+	bool rButtonPressed;
 	std::queue<Mouse::Event> events;
 	const int maxBufferSize = -1;
 private:
-	static POINTS AddPoints(POINTS p1, POINTS p2);
+	static std::pair<int, int> AddPositions(std::pair<int, int> p1, std::pair<int, int> p2);
+	static std::pair<int, int> ToPair(POINTS pt);
 };

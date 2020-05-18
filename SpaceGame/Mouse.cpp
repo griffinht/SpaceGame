@@ -1,10 +1,11 @@
 #include "Mouse.h"
+#include <string>
 
 Mouse::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
 {
 	this->type = type;
-	this->mousePosition = MAKEPOINTS(lParam);
-	this->wParam = wParam
+	this->mousePosition = ToPair(MAKEPOINTS(lParam));
+	this->wParam = wParam;
 }
 
 Mouse::Event::Type Mouse::Event::getType()
@@ -12,19 +13,19 @@ Mouse::Event::Type Mouse::Event::getType()
 	return type;
 }
 
-POINTS Mouse::Event::GetMousePos()
+std::pair<int, int> Mouse::Event::GetPos()
 {
-	return POINTS();
+	return mousePosition;
 }
 
-float Mouse::Event::GetMousePosX()
+int Mouse::Event::GetPosX()
 {
-	return mousePosition.x;
+	return mousePosition.first;
 }
 
-float Mouse::Event::GetMousePosY()
+int Mouse::Event::GetPosY()
 {
-	return mousePosition.y;
+	return mousePosition.second;
 }
 
 WPARAM Mouse::Event::getWParam() 
@@ -45,19 +46,36 @@ std::optional<Mouse::Event> Mouse::GetEvent()
 	}
 }
 
-POINTS Mouse::AddPoints(POINTS p1, POINTS p2)
+std::pair<int, int> Mouse::AddPositions(std::pair<int, int> p1, std::pair<int, int> p2)
 {
-	return POINTS({ p1.x + p2.x, p1.y + p2.y });
+	return std::pair<int, int>({ p1.first + p2.first, p1.second + p2.second});
 }
+
+std::pair<int, int> Mouse::ToPair(POINTS pt)
+{
+	return std::pair<int, int>(pt.x, pt.y);
+}
+
+Mouse::Mouse()
+	:
+	mousePosition{0,0},
+	mousePositionDelta{0,0},
+	mouseWheelDelta(0),
+	lButtonPressed(false),
+	mButtonPressed(false),
+	rButtonPressed(false)
+{}
 
 void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 {
 	switch (type)
 	{
 	case Mouse::Event::Type::Move:
-		POINTS pt = MAKEPOINTS(lParam);
-		mousePosition = AddPoints(mousePosition, pt);
-		mousePositionDelta = AddPoints(mousePositionDelta, pt);
+		{
+			std::pair<int, int> pos = ToPair(MAKEPOINTS(lParam));
+			mousePosition = AddPositions(mousePosition, pos);
+			mousePositionDelta = AddPositions(mousePositionDelta, pos);
+		}
 		break;
 	case Mouse::Event::Type::LButtonDown:
 		lButtonPressed = true;
@@ -88,39 +106,39 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-POINTS Mouse::GetMousePos()
+std::pair<int, int> Mouse::GetPos()
 {
 	return mousePosition;
 }
 
-float Mouse::GetMousePosX()
+int Mouse::GetPosX()
 {
-	return mousePosition.x;
+	return mousePosition.first;
 }
 
-float Mouse::GetMousePosY()
+int Mouse::GetPosY()
 {
-	return mousePosition.y;
+	return mousePosition.second;
 }
 
-POINTS Mouse::GetMousePosDelta()
+std::pair<int, int> Mouse::GetPosDelta()
 {
-	POINTS d = mousePositionDelta;
-	mousePositionDelta = POINTS({ 0, 0 });
+	std::pair<int, int> d = mousePositionDelta;
+	mousePositionDelta = { 0, 0 };
 	return d;
 }
 
-float Mouse::GetMousePosDeltaX()
+int Mouse::GetPosDeltaX()
 {
-	return mousePositionDelta.x;
+	return mousePositionDelta.first;
 }
 
-float Mouse::GetMousePosDeltaY()
+int Mouse::GetPosDeltaY()
 {
-	return mousePositionDelta.y;
+	return mousePositionDelta.second;
 }
 
-int Mouse::GetMouseWheelDelta()
+int Mouse::GetWheelDelta()
 {
 	int d = mouseWheelDelta;
 	mouseWheelDelta = 0;
