@@ -4,9 +4,6 @@
 #include <condition_variable>
 
 Engine::Engine()
-	:
-	window("SpaceGame"),
-	threadPool(1, 1)
 {
 	controlThread = std::thread(&Engine::ControlLoop, this);
 
@@ -26,11 +23,6 @@ Engine::Engine()
 		}
 	}
 	std::exit((int)msg.wParam);
-}
-
-Engine::~Engine()
-{
-	//todo should this be something?
 }
 
 void Engine::ControlLoop()
@@ -61,7 +53,7 @@ void Engine::ControlLoop()
 		if (dtRender >= maxFrameTime)
 		{
 			frames++;
-			threadPool.QueueJob([this, ticks, dtTick, dtRender]() {Render(ticks + (dtTick / tickTime), dtRender);});
+			threadPool->QueueJob([this, ticks, dtTick, dtRender]() {Render(ticks + (dtTick / tickTime), dtRender);});
 			lastRender = now;
 		}
 	}
@@ -95,19 +87,19 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString("\n");
 	*/
 	try {
-		window.Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
-		window.Graphics().drawTriangle(tick / 60, window.Mouse().GetMousePosX, window.Mouse().GetMousePosY);//60 is a random constant i think
-		window.Graphics().FlipBuffer();//this waits for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
+		window->Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
+		window->Graphics().drawTriangle(tick / 60, window->mouse->GetPosX(), window->mouse->GetPosY());//60 is a random constant i think
+		window->Graphics().FlipBuffer();//this waits for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
 	}
 	catch (Graphics::InfoException & e)
 	{
-		window.SetTitle(e.what());
+		window->SetTitle(e.what());
 		OutputDebugString("Nonfatal Engine Error:");
 		OutputDebugString(e.what());
 	}
 	catch (EngineException & e)
 	{
-		window.SetTitle(e.what());
+		window->SetTitle(e.what());
 		OutputDebugString("Fatal Engine Error: ");
 		OutputDebugString(e.what());
 		PostQuitMessage(-1);

@@ -58,16 +58,6 @@ Graphics& Window::Graphics()
 	return *pGraphics;
 }
 
-Mouse& Window::Mouse()
-{
-	return *mouse;
-}
-
-Keyboard& Window::Keyboard()
-{
-	return *keyboard;
-}
-
 void Window::SetTitle(const char* name)
 {
 	SetWindowText(hWnd, name);

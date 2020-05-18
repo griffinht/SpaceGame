@@ -9,7 +9,6 @@ class Engine
 {
 public:
 	Engine();
-	~Engine();
 private:
 	void ControlLoop();
 	void Tick(int tick, float dt);
@@ -22,8 +21,8 @@ private:
 	std::mutex renderMutex;
 	std::condition_variable renderCondVar;
 private:
-	Window window;
-	ThreadPool threadPool;
+	std::unique_ptr<Window> window = std::unique_ptr<Window>(new Window("SpaceGame"));
+	std::unique_ptr<ThreadPool> threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(1, 1));
 	bool running = true;
 private:
 	const float maxFrameRate = 666;
