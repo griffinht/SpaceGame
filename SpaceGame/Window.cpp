@@ -90,22 +90,22 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		PostQuitMessage(0);
 		break;
 	case WM_KEYDOWN:
-		keyboard.OnEvent(Window::Keyboard::Event::Type::Keydown, wParam, lParam);
+		keyboard.OnEvent(Keyboard::Event::Type::Keydown, wParam, lParam);
 		break;
 	case WM_KEYUP:
-		keyboard.OnEvent(Window::Keyboard::Event::Type::Keyup, wParam, lParam);
+		keyboard.OnEvent(Keyboard::Event::Type::Keyup, wParam, lParam);
 		break;
 	case WM_CHAR:
-		keyboard.OnEvent(Window::Keyboard::Event::Type::Char, wParam, lParam);
+		keyboard.OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
 		break;
 	case WM_MOUSEMOVE:
-		mouse.OnEvent(Window::Mouse::Event::Type::Move, wParam, lParam);
+		mouse.OnEvent(Mouse::Event::Type::Move, wParam, lParam);
 		break;
 	case WM_LBUTTONDOWN:
-		mouse.OnEvent(Window::Mouse::Event::Type::LButtonDown, wParam, lParam);
+		mouse.OnEvent(Mouse::Event::Type::LButtonDown, wParam, lParam);
 		break;
 	case WM_LBUTTONUP:
-		mouse.OnEvent(Window::Mouse::Event::Type::LButtonUp, wParam, lParam);
+		mouse.OnEvent(Mouse::Event::Type::LButtonUp, wParam, lParam);
 		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -164,84 +164,4 @@ std::string Window::HrException::GetErrorDescription() const
 const char* Window::NoGraphicsException::GetType() const
 {
 	return "Window Exception [No Graphics]";
-}
-
-Window::Mouse::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
-{
-	this->type = type;
-	this->wParam = wParam;
-	this->points = MAKEPOINTS(lParam);
-}
-
-Window::Mouse::Event::Type Window::Mouse::Event::getType()
-{
-	return type;
-}
-
-POINTS Window::Mouse::Event::getPoints()
-{
-	return points;
-}
-
-WPARAM Window::Mouse::Event::getWParam()
-{
-	return wParam;
-}
-
-std::optional<Window::Mouse::Event> Window::Mouse::GetEvent()
-{
-	if (events.empty())
-	{
-		return std::optional<Window::Mouse::Event>();
-	}
-	else
-	{
-		return std::optional<Window::Mouse::Event>(events.front());
-		events.pop();
-	}
-}
-
-void Window::Mouse::OnEvent(Window::Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
-{
-	events.push(Window::Mouse::Event::Event(type, wParam, lParam));
-}
-
-Window::Keyboard::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
-{
-	this->type = type;
-	this->wParam = wParam;
-	this->points = MAKEPOINTS(lParam);
-}
-
-Window::Keyboard::Event::Type Window::Keyboard::Event::getType()
-{
-	return type;
-}
-
-POINTS Window::Keyboard::Event::getPoints()
-{
-	return points;
-}
-
-WPARAM Window::Keyboard::Event::getWParam()
-{
-	return wParam;
-}
-
-std::optional<Window::Keyboard::Event> Window::Keyboard::GetEvent()
-{
-	if (events.empty())
-	{
-		return std::optional<Window::Keyboard::Event>();
-	}
-	else
-	{
-		return std::optional<Window::Keyboard::Event>(events.front());
-		events.pop();
-	}
-}
-
-void Window::Keyboard::OnEvent(Window::Keyboard::Event::Type type, WPARAM wParam, LPARAM lParam)
-{
-	events.push(Window::Keyboard::Event::Event(type, wParam, lParam));
 }

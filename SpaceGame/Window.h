@@ -2,6 +2,8 @@
 
 #include <Windows.h>
 #include "Graphics.h"
+#include "Mouse.h"
+#include "Keyboard.h"
 #include <string>
 #include <memory>
 #include <optional>
@@ -14,69 +16,8 @@ public:
 	~Window();
 	Graphics& Graphics();
 	void SetTitle(const char* name);
-	class Mouse
-	{
-	public:
-		class Event
-		{
-		public:
-			enum class Type
-			{
-				Move,
-				LButtonDown,
-				LButtonUp,
-				MButtonDown,
-				MButtonUp,
-				MouseWheel,
-				RButtonDown,
-				RButtonUp
-			};
-		public:
-			Event(Type type, WPARAM wParam, LPARAM lParam);
-			Type getType();
-			POINTS getPoints();
-			WPARAM getWParam();
-		private:
-			Type type;
-			POINTS points;
-			WPARAM wParam;
-		};
-	public:
-		Mouse() = default;
-		std::optional<Window::Mouse::Event> GetEvent();
-		void OnEvent(Window::Mouse::Event::Type type, WPARAM wParam, LPARAM lParam);
-	private:
-		std::queue<Window::Mouse::Event> events;
-	};
-	class Keyboard
-	{
-	public:
-		class Event
-		{
-		public:
-			enum class Type
-			{
-				Keydown,
-				Keyup,
-				Char,
-			};
-		public:
-			Event(Type type, WPARAM wParam, LPARAM lParam);
-			Type getType();
-			POINTS getPoints();
-			WPARAM getWParam();
-		private:
-			Type type;
-			POINTS points;
-			WPARAM wParam;
-		};
-	public:
-		Keyboard() = default;
-		std::optional<Window::Keyboard::Event> GetEvent();
-		void OnEvent(Window::Keyboard::Event::Type type, WPARAM wParam, LPARAM lParam);
-	private:
-		std::queue<Window::Keyboard::Event> events;
-	};
+
+
 
 private:
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -85,8 +26,8 @@ private:
 	HINSTANCE hInstance;
 	HWND hWnd;
 	std::unique_ptr<::Graphics> pGraphics;
-	Window::Mouse mouse;
-	Window::Keyboard keyboard;
+	Mouse mouse;
+	Keyboard keyboard;
 public:
 	class Exception : public EngineException
 	{
