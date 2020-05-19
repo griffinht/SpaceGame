@@ -94,7 +94,7 @@ void Engine::Render(float tick, float dt)
 		window->Graphics().drawTriangle(tick / 60,
 			window->mouse.GetPosX() / 640.0f - 1.0f,
 			-window->mouse.GetPosY() / 360.0f + 1.0f);
-		window->Graphics().FlipBuffer();//this waits for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
+		window->Graphics().Present(1, 0);//this can wait for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
 	}
 	catch (Graphics::InfoException & e)
 	{

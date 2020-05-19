@@ -27,7 +27,7 @@ Graphics::Graphics(HWND hWnd)
 	sd.BufferCount = 2; //buffering
 	sd.OutputWindow = hWnd;
 	sd.Windowed = TRUE;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;//todo change to flip
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//todo change to flip
 	sd.Flags = 0;
 
 	UINT creationFlags = 0;
@@ -60,7 +60,7 @@ Graphics::Graphics(HWND hWnd)
 	dsDesc.DepthEnable = TRUE;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
+	
 	GRAPHICS_THROW_INFO(pDevice->CreateDepthStencilState(&dsDesc, &pDSState));
 
 	// bind depth state
@@ -93,10 +93,10 @@ Graphics::Graphics(HWND hWnd)
 	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get());
 }
 
-void Graphics::FlipBuffer()
+void Graphics::Present(UINT syncInterval, UINT flags)
 {
 	HRESULT hr;
-	if (FAILED(hr = pSwap->Present(1u, 0u)))
+	if (FAILED(hr = pSwap->Present(syncInterval, flags)))
 	{
 		if (hr == DXGI_ERROR_DEVICE_REMOVED)
 		{
@@ -114,7 +114,7 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
-	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0u);
 }
 
 void Graphics::drawTriangle(float angle, float x, float z)
@@ -300,6 +300,9 @@ void Graphics::drawTriangle(float angle, float x, float z)
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
 	pContext->RSSetViewports(1u, &vp);
+
+	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
+	pContext->OMSetDepthStencilState(pDSState.Get(), 1);
 
 	GRAPHICS_THROW_INFO_ONLY(pContext->DrawIndexed((UINT)std::size(indices), 0u, 0u));
 }

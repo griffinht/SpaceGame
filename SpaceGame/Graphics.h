@@ -12,7 +12,7 @@ class Graphics
 public:
 	Graphics(HWND hWnd);
 	~Graphics() = default;
-	void FlipBuffer();
+	void Present(UINT syncInterval, UINT flags);
 	void ClearBuffer(float red, float green, float blue);
 	void drawTriangle(float angle, float x, float y);
 private:
@@ -22,6 +22,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
 public:
 	class Exception : public EngineException
 	{
