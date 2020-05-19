@@ -58,5 +58,4 @@ void ThreadPool::ThreadEntry(int i)
 
         job();
     }
-
 }

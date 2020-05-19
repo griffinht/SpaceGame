@@ -24,38 +24,34 @@ Graphics::Graphics(HWND hWnd)
 
 void Graphics::Present(UINT syncInterval, UINT flags)
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
-	HRESULT hr;
-	if (FAILED(hr = pSwap->Present(syncInterval, flags)))
+	if (presentReady)
 	{
-		if (hr == DXGI_ERROR_DEVICE_REMOVED)
+		HRESULT hr;
+		if (FAILED(hr = pSwap->Present(syncInterval, flags)))
 		{
-			throw GRAPHICS_DEVICE_REMOVED_EXCEPT(pDevice->GetDeviceRemovedReason());
-		}
-		else
-		{
-			GRAPHICS_THROW_INFO(hr);
+			if (hr == DXGI_ERROR_DEVICE_REMOVED)
+			{
+				throw GRAPHICS_DEVICE_REMOVED_EXCEPT(pDevice->GetDeviceRemovedReason());
+			}
+			else
+			{
+				GRAPHICS_THROW_INFO(hr);
+			}
 		}
 	}
-	
 }
 
 void Graphics::Clear(float red, float green, float blue)
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 
 	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
-
-	CD3D11_VIEWPORT viewport(0.0f, 0.0f, backBufferWidth, backBufferHeight);
-	pContext->RSSetViewports(1, &viewport);
 }
 
 void Graphics::CreateDevice()
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
 	UINT creationFlags = 0;
 #ifdef _DEBUG
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -121,7 +117,6 @@ void Graphics::CreateDevice()
 
 void Graphics::CreateResources()
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
 	ID3D11RenderTargetView* nullViews[] = { nullptr };
 	pContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
 	pTarget.Reset();
@@ -208,19 +203,18 @@ void Graphics::CreateResources()
 	GRAPHICS_THROW_INFO(pDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, pDSV.ReleaseAndGetAddressOf()));
 
 	// TODO: Initialize windows-size dependent objects here.
+	CD3D11_VIEWPORT viewport(0.0f, 0.0f, (float)backBufferWidth, (float)backBufferHeight);
+	pContext->RSSetViewports(1, &viewport);
 }
 
 void Graphics::SetFullscreenState(bool fullscreen)
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
 	HRESULT hr;
 	GRAPHICS_THROW_INFO(pSwap->SetFullscreenState(fullscreen, nullptr));
-	ResizeBuffers(0, 0);
 }
 
 void Graphics::ResizeBuffers(UINT width, UINT height)
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
 	if (pSwap)
 	{
 		if (width > 0)
@@ -250,14 +244,13 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 		//this is usually done on Clear()
 		pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), NULL);
 
-		CD3D11_VIEWPORT viewport(0.0f, 0.0f, backBufferWidth, backBufferHeight);
+		CD3D11_VIEWPORT viewport(0.0f, 0.0f, (float)backBufferWidth, (float)backBufferHeight);
 		pContext->RSSetViewports(1, &viewport);
 	}
 }
 
 void Graphics::drawTriangle(float angle, float x, float z)
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
 	HRESULT hr;
 
 	struct Vertex
@@ -434,7 +427,6 @@ void Graphics::drawTriangle(float angle, float x, float z)
 
 void Graphics::OnDeviceLost()
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
 	// TODO: Add Direct3D resource cleanup here.
 
 	pDSV.Reset();
