@@ -103,6 +103,7 @@ Graphics::Graphics(HWND hWnd)
 
 void Graphics::Present(UINT syncInterval, UINT flags)
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	HRESULT hr;
 	if (FAILED(hr = pSwap->Present(syncInterval, flags)))
 	{
@@ -120,18 +121,20 @@ void Graphics::Present(UINT syncInterval, UINT flags)
 
 void Graphics::Clear(float red, float green, float blue)
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
-	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0u);
+	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 
 	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
 
-	CD3D11_VIEWPORT viewport(0.0f, 0.0f, 1280, 720);
+	CD3D11_VIEWPORT viewport(0.0f, 0.0f, backBufferWidth, backBufferHeight);
 	pContext->RSSetViewports(1, &viewport);
 }
 
 void Graphics::CreateDevice()
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	UINT creationFlags = 0;
 #ifdef _DEBUG
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -197,15 +200,13 @@ void Graphics::CreateDevice()
 
 void Graphics::CreateResources()
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	ID3D11RenderTargetView* nullViews[] = { nullptr };
 	pContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
 	pTarget.Reset();
 	pDSV.Reset();
 	pContext->Flush();
 
-	const DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
-	const DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	constexpr UINT backBufferCount = 2;
 	HRESULT hr;
 	// If the swap chain already exists, resize it, otherwise create one.
 	if (pSwap)
@@ -249,7 +250,7 @@ void Graphics::CreateResources()
 		swapChainDesc.SampleDesc.Quality = 0;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = backBufferCount;
-		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapChainDesc.SwapEffect = swapEffect;
 
 		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = {};
 		fsSwapChainDesc.Windowed = TRUE;
@@ -290,18 +291,46 @@ void Graphics::CreateResources()
 
 void Graphics::SetFullscreenState(bool fullscreen)
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	HRESULT hr;
 	GRAPHICS_THROW_INFO(pSwap->SetFullscreenState(fullscreen, nullptr));
+	ResizeBuffers(0, 0);
+}
 
-	WRL::ComPtr<ID3D11Debug> pDebug;
-	pDevice->QueryInterface(pDebug.GetAddressOf());
-	GRAPHICS_THROW_INFO(pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL|D3D11_RLDO_IGNORE_INTERNAL));
+void Graphics::ResizeBuffers(UINT width, UINT height)
+{
+	std::lock_guard<std::mutex> lockGuard(mutex);
+	if (pSwap)
+	{
+		if (width > 0)
+		{
+			backBufferWidth = width;
+		}
+		if (height > 0)
+		{
+			backBufferHeight = height;
+		}
+		
+		pContext->OMGetRenderTargets(0, 0, 0);
+		pTarget->Release();
 
-	GRAPHICS_THROW_INFO(pSwap->ResizeBuffers(2, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0));
+		HRESULT hr;
+		GRAPHICS_THROW_INFO(pSwap->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
+
+		WRL::ComPtr<ID3D11Texture2D> backBuffer;
+		GRAPHICS_THROW_INFO(pSwap->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf())));
+		GRAPHICS_THROW_INFO(pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, pTarget.GetAddressOf()));
+		CD3D11_TEXTURE2D_DESC depthStencilDesc(depthBufferFormat, backBufferWidth, backBufferHeight, 1, 1, D3D11_BIND_DEPTH_STENCIL);
+		WRL::ComPtr<ID3D11Texture2D> depthStencil;
+		GRAPHICS_THROW_INFO(pDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencil.GetAddressOf()));
+		CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
+		GRAPHICS_THROW_INFO(pDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, pDSV.ReleaseAndGetAddressOf()));
+	}
 }
 
 void Graphics::drawTriangle(float angle, float x, float z)
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	HRESULT hr;
 
 	struct Vertex
@@ -478,6 +507,7 @@ void Graphics::drawTriangle(float angle, float x, float z)
 
 void Graphics::OnDeviceLost()
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	// TODO: Add Direct3D resource cleanup here.
 
 	pDSV.Reset();

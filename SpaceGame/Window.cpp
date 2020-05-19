@@ -28,12 +28,16 @@ Window::Window(const char* name)
 	rect.right = 1280;
 	rect.top = 0;
 	rect.bottom = 720;
-	AdjustWindowRect(&rect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, false);
+
+	DWORD dwExStyle = 0;
+	DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX;
+	AdjustWindowRectEx(&rect, dwStyle, false, dwExStyle);
 	//window instance
 	hWnd = CreateWindowEx(
-		0, CLASS_NAME,
+		dwExStyle,
+		CLASS_NAME,
 		name,
-		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+		dwStyle,
 		CW_USEDEFAULT, 
 		CW_USEDEFAULT, 
 		rect.right - rect.left, 
@@ -122,6 +126,11 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_LBUTTONUP:
 		mouse.OnEvent(Mouse::Event::Type::LButtonUp, wParam, lParam);
 		break;
+	case WM_SIZE:
+		if (pGraphics)
+		{
+			Graphics().ResizeBuffers(LOWORD(lParam), HIWORD(lParam));
+		}
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }

@@ -7,6 +7,7 @@
 #include <vector>
 #include <wrl.h>
 #include "DXGIInfoManager.h"
+#include <mutex>
 
 class Graphics
 {
@@ -18,19 +19,26 @@ public:
 	void CreateDevice();
 	void CreateResources();
 	void SetFullscreenState(bool fullscreen);
+	void ResizeBuffers(UINT width, UINT height);
 	void drawTriangle(float angle, float x, float y);
 	void OnDeviceLost();
 private:
+	std::mutex mutex;
 	HWND hWnd;
-	UINT backBufferWidth;
-	UINT backBufferHeight;
-	D3D_FEATURE_LEVEL featureLevel;
 	DxgiInfoManager infoManager;
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> pSwap;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+private:
+	UINT backBufferWidth;
+	UINT backBufferHeight;
+	D3D_FEATURE_LEVEL featureLevel;
+	DXGI_SWAP_EFFECT swapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	const DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+	const DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	const UINT backBufferCount = 2;
 public:
 	class Exception : public EngineException
 	{
