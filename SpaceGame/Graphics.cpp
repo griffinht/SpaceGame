@@ -14,8 +14,8 @@ namespace DX = DirectX;
 Graphics::Graphics(HWND hWnd)
 	:
 	hWnd(hWnd),
-	backBufferWidth(800),
-	backBufferHeight(600),
+	backBufferWidth(1280),
+	backBufferHeight(720),
 	featureLevel(D3D_FEATURE_LEVEL_11_1)
 {
 	/*
