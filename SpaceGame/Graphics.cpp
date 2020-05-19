@@ -265,7 +265,7 @@ void Graphics::CreateResources()
 		));
 
 		// This template does not support exclusive fullscreen mode and prevents DXGI from responding to the ALT+ENTER shortcut.
-		GRAPHICS_THROW_INFO(dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER));
+		//GRAPHICS_THROW_INFO(dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER));
 	}
 
 	// Obtain the backbuffer for this window which will be the final 3D rendertarget.
