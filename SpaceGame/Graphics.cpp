@@ -8,11 +8,17 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
 
-namespace wrl = Microsoft::WRL;
-namespace dx = DirectX;
+namespace WRL = Microsoft::WRL;
+namespace DX = DirectX;
 
 Graphics::Graphics(HWND hWnd)
+	:
+	hWnd(hWnd),
+	backBufferWidth(800),
+	backBufferHeight(600),
+	featureLevel(D3D_FEATURE_LEVEL_11_1)
 {
+	/*
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
 	sd.BufferDesc.Height = 0;
@@ -50,10 +56,9 @@ Graphics::Graphics(HWND hWnd)
 		&pContext
 	));
 
-	wrl::ComPtr<ID3D11Resource> pBackBuffer;
+	WRL::ComPtr<ID3D11Resource> pBackBuffer;
 	GRAPHICS_THROW_INFO(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
 	GRAPHICS_THROW_INFO(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget));
-
 
 	// create depth stensil state
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -61,13 +66,13 @@ Graphics::Graphics(HWND hWnd)
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	
-	GRAPHICS_THROW_INFO(pDevice->CreateDepthStencilState(&dsDesc, &pDSState));
+	(pDevice->CreateDepthStencilState(&dsDesc, &pDSState));
 
 	// bind depth state
 	pContext->OMSetDepthStencilState(pDSState.Get(), 1u);
 
 	// create depth stensil texture
-	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
+	WRL::ComPtr<ID3D11Texture2D> pDepthStencil;
 	D3D11_TEXTURE2D_DESC descDepth = {};
 	descDepth.Width = 1280u;
 	descDepth.Height = 720u;
@@ -87,10 +92,13 @@ Graphics::Graphics(HWND hWnd)
 	descDSV.Texture2D.MipSlice = 0u;
 	GRAPHICS_THROW_INFO(pDevice->CreateDepthStencilView(
 		pDepthStencil.Get(), &descDSV, &pDSV
-	));
+	));;
 
 	// bind depth stensil view to OM
 	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get());
+	*/
+	CreateDevice();
+	CreateResources();
 }
 
 void Graphics::Present(UINT syncInterval, UINT flags)
@@ -110,16 +118,189 @@ void Graphics::Present(UINT syncInterval, UINT flags)
 	
 }
 
-void Graphics::ClearBuffer(float red, float green, float blue)
+void Graphics::Clear(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0u);
+
+	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
+
+	CD3D11_VIEWPORT viewport(0.0f, 0.0f, 1280, 720);
+	pContext->RSSetViewports(1, &viewport);
+}
+
+void Graphics::CreateDevice()
+{
+	UINT creationFlags = 0;
+#ifdef _DEBUG
+	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	static const D3D_FEATURE_LEVEL featureLevels [] =
+	{
+		// TODO: Modify for supported Direct3D feature levels
+		D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_9_3,
+		D3D_FEATURE_LEVEL_9_2,
+		D3D_FEATURE_LEVEL_9_1,
+	};
+
+	WRL::ComPtr<ID3D11Device> device;
+	WRL::ComPtr<ID3D11DeviceContext> context;
+	HRESULT hr;
+	GRAPHICS_THROW_INFO(D3D11CreateDevice(
+		nullptr,
+		D3D_DRIVER_TYPE_HARDWARE,
+		nullptr,
+		creationFlags,
+		featureLevels,
+		_countof(featureLevels),
+		D3D11_SDK_VERSION,
+		device.ReleaseAndGetAddressOf(),
+		&featureLevel,
+		context.ReleaseAndGetAddressOf()
+	));
+
+#ifndef NDEBUG
+	WRL::ComPtr<ID3D11Debug> d3dDebug;
+	if (SUCCEEDED(device.As(&d3dDebug)))
+	{
+		WRL::ComPtr<ID3D11InfoQueue> d3dInfoQueue;
+		if (SUCCEEDED(d3dDebug.As(&d3dInfoQueue)))
+		{
+#ifdef _DEBUG
+			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
+			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
+#endif
+			D3D11_MESSAGE_ID hide[] =
+			{
+				D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
+				// TODO: Add more message IDs here as needed.
+			};
+			D3D11_INFO_QUEUE_FILTER filter = {};
+			filter.DenyList.NumIDs = _countof(hide);
+			filter.DenyList.pIDList = hide;
+			d3dInfoQueue->AddStorageFilterEntries(&filter);
+		}
+	}
+#endif
+
+	GRAPHICS_THROW_INFO(device.As(&pDevice));
+	GRAPHICS_THROW_INFO(context.As(&pContext));
+
+	// TODO: Initialize device dependent objects here (independent of window size).
+}
+
+void Graphics::CreateResources()
+{
+	ID3D11RenderTargetView* nullViews[] = { nullptr };
+	pContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
+	pTarget.Reset();
+	pDSV.Reset();
+	pContext->Flush();
+
+	const DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+	const DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	constexpr UINT backBufferCount = 2;
+	HRESULT hr;
+	// If the swap chain already exists, resize it, otherwise create one.
+	if (pSwap)
+	{
+		hr = pSwap->ResizeBuffers(backBufferCount, backBufferWidth, backBufferHeight, backBufferFormat, 0);
+
+		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+		{
+			// If the device was removed for any reason, a new device and swap chain will need to be created.
+			OnDeviceLost();
+
+			// Everything is set up now. Do not continue execution of this method. OnDeviceLost will reenter this method 
+			// and correctly set up the new device.
+			return;
+		}
+		else
+		{
+			GRAPHICS_THROW_INFO(hr);
+		}
+	}
+	else
+	{
+		// First, retrieve the underlying DXGI Device from the D3D Device.
+		WRL::ComPtr<IDXGIDevice1> dxgiDevice;
+		GRAPHICS_THROW_INFO(pDevice.As(&dxgiDevice));
+
+		// Identify the physical adapter (GPU or card) this device is running on.
+		WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
+		GRAPHICS_THROW_INFO(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
+
+		// And obtain the factory object that created it.
+		WRL::ComPtr<IDXGIFactory2> dxgiFactory;
+		GRAPHICS_THROW_INFO(dxgiAdapter->GetParent(IID_PPV_ARGS(dxgiFactory.GetAddressOf())));
+
+		// Create a descriptor for the swap chain.
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+		swapChainDesc.Width = backBufferWidth;
+		swapChainDesc.Height = backBufferHeight;
+		swapChainDesc.Format = backBufferFormat;
+		swapChainDesc.SampleDesc.Count = 1;
+		swapChainDesc.SampleDesc.Quality = 0;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = backBufferCount;
+
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = {};
+		fsSwapChainDesc.Windowed = TRUE;
+
+		// Create a SwapChain from a Win32 window.
+		GRAPHICS_THROW_INFO(dxgiFactory->CreateSwapChainForHwnd(
+			pDevice.Get(),
+			hWnd,
+			&swapChainDesc,
+			&fsSwapChainDesc,
+			nullptr,
+			pSwap.ReleaseAndGetAddressOf()
+		));
+
+		// This template does not support exclusive fullscreen mode and prevents DXGI from responding to the ALT+ENTER shortcut.
+		GRAPHICS_THROW_INFO(dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER));
+	}
+
+	// Obtain the backbuffer for this window which will be the final 3D rendertarget.
+	WRL::ComPtr<ID3D11Texture2D> backBuffer;
+	GRAPHICS_THROW_INFO(pSwap->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf())));
+
+	// Create a view interface on the rendertarget to use on bind.
+	GRAPHICS_THROW_INFO(pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, pTarget.ReleaseAndGetAddressOf()));
+
+	// Allocate a 2-D surface as the depth/stencil buffer and
+	// create a DepthStencil view on this surface to use on bind.
+	CD3D11_TEXTURE2D_DESC depthStencilDesc(depthBufferFormat, backBufferWidth, backBufferHeight, 1, 1, D3D11_BIND_DEPTH_STENCIL);
+
+	WRL::ComPtr<ID3D11Texture2D> depthStencil;
+	GRAPHICS_THROW_INFO(pDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencil.GetAddressOf()));
+
+	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
+	GRAPHICS_THROW_INFO(pDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, pDSV.ReleaseAndGetAddressOf()));
+
+	// TODO: Initialize windows-size dependent objects here.
+}
+
+void Graphics::SetFullscreenState(bool fullscreen)
+{
+	HRESULT hr;
+	GRAPHICS_THROW_INFO(pSwap->SetFullscreenState(fullscreen, nullptr));
+
+	WRL::ComPtr<ID3D11Debug> pDebug;
+	pDevice->QueryInterface(pDebug.GetAddressOf());
+	GRAPHICS_THROW_INFO(pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL|D3D11_RLDO_IGNORE_INTERNAL));
+
+	GRAPHICS_THROW_INFO(pSwap->ResizeBuffers(2, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0));
 }
 
 void Graphics::drawTriangle(float angle, float x, float z)
 {
-	namespace wrl = Microsoft::WRL;
 	HRESULT hr;
 
 	struct Vertex
@@ -145,7 +326,7 @@ void Graphics::drawTriangle(float angle, float x, float z)
 		{ 1.0f,1.0f,1.0f },
 	};
 
-	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
+	WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
 	D3D11_BUFFER_DESC bd = {};
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.Usage = D3D11_USAGE_DEFAULT;
@@ -174,7 +355,7 @@ void Graphics::drawTriangle(float angle, float x, float z)
 		0,1,4,1,5,4,
 
 	};
-	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
+	WRL::ComPtr<ID3D11Buffer> pIndexBuffer;
 	D3D11_BUFFER_DESC ibd = {};
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibd.Usage = D3D11_USAGE_DEFAULT;
@@ -192,20 +373,20 @@ void Graphics::drawTriangle(float angle, float x, float z)
 	// create constant buffer for transformation matrix
 	struct ConstantBuffer
 	{
-		dx::XMMATRIX transform;
+		DX::XMMATRIX transform;
 	};
 	const ConstantBuffer cb =//todo replace with actual aspect ratio
 	{
 		{
-			dx::XMMatrixTranspose(
-				dx::XMMatrixRotationZ(angle) *
-				dx::XMMatrixRotationX(angle) *
-				dx::XMMatrixTranslation(x, 0.0f, z + 4.0f) *
-				dx::XMMatrixPerspectiveLH(1.0f, 9.0f/16.0f, 0.5f, 10.0f)
+			DX::XMMatrixTranspose(
+				DX::XMMatrixRotationZ(angle) *
+				DX::XMMatrixRotationX(angle) *
+				DX::XMMatrixTranslation(x, 0.0f, z + 4.0f) *
+				DX::XMMatrixPerspectiveLH(1.0f, 9.0f/16.0f, 0.5f, 10.0f)
 			)
 		}
 	};
-	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+	WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
 	D3D11_BUFFER_DESC cbd;
 	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbd.Usage = D3D11_USAGE_DYNAMIC;
@@ -242,7 +423,7 @@ void Graphics::drawTriangle(float angle, float x, float z)
 		}
 	};
 
-	wrl::ComPtr<ID3D11Buffer> pConstantBuffer2;
+	WRL::ComPtr<ID3D11Buffer> pConstantBuffer2;
 	D3D11_BUFFER_DESC cbd2;
 	cbd2.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbd2.Usage = D3D11_USAGE_DEFAULT;
@@ -258,22 +439,22 @@ void Graphics::drawTriangle(float angle, float x, float z)
 	pContext->PSSetConstantBuffers(0u, 1u, pConstantBuffer2.GetAddressOf());
 
 	// create pixel shader
-	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
-	wrl::ComPtr<ID3DBlob> pBlob;
+	WRL::ComPtr<ID3D11PixelShader> pPixelShader;
+	WRL::ComPtr<ID3DBlob> pBlob;
 	GRAPHICS_THROW_INFO(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
 	GRAPHICS_THROW_INFO(pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
 	// bind pixel shader
 	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
 
 	// create and vertex shader
-	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
+	WRL::ComPtr<ID3D11VertexShader> pVertexShader;
 	GRAPHICS_THROW_INFO(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
 	GRAPHICS_THROW_INFO(pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
 	// bind vertex shader
 	pContext->VSSetShader(pVertexShader.Get(), 0, 0);
 
 	// input
-	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
+	WRL::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
 		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -291,20 +472,22 @@ void Graphics::drawTriangle(float angle, float x, float z)
 	// set primitive to triangle list
 	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// viewport
-	D3D11_VIEWPORT vp;
-	vp.Width = 1280;
-	vp.Height = 720;
-	vp.MinDepth = 0;
-	vp.MaxDepth = 1;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
-	pContext->RSSetViewports(1u, &vp);
-
-	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
-	pContext->OMSetDepthStencilState(pDSState.Get(), 1);
-
 	GRAPHICS_THROW_INFO_ONLY(pContext->DrawIndexed((UINT)std::size(indices), 0u, 0u));
+}
+
+void Graphics::OnDeviceLost()
+{
+	// TODO: Add Direct3D resource cleanup here.
+
+	pDSV.Reset();
+	pTarget.Reset();
+	pSwap.Reset();
+	pContext.Reset();
+	pDevice.Reset();
+
+	CreateDevice();
+
+	CreateResources();
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) 

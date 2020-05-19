@@ -87,7 +87,7 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString("\n");
 	*/
 	try {
-		window->Graphics().ClearBuffer(0.0f, 1.0f, 0.0f);
+		window->Graphics().Clear(0.0f, 1.0f, 0.0f);
 		window->Graphics().drawTriangle(tick / 60, //60 is a random constant i think
 			0, 
 			0);
