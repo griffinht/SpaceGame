@@ -40,6 +40,7 @@ void Graphics::Present(UINT syncInterval, UINT flags)
 
 void Graphics::Clear(float red, float green, float blue)
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
@@ -188,9 +189,9 @@ void Graphics::SetFullscreenState(bool fullscreen)
 
 void Graphics::ResizeBuffers(UINT width, UINT height)
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	if (pSwap)
 	{
-		std::lock_guard<std::mutex> lockGuard(graphicsMutex);
 		if (width > 0)
 		{
 			backBufferWidth = width;
@@ -225,6 +226,7 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 
 void Graphics::drawTriangle(float angle, float x, float z)
 {
+	std::lock_guard<std::mutex> lockGuard(mutex);
 	HRESULT hr;
 
 	struct Vertex
