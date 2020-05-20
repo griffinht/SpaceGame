@@ -4,6 +4,7 @@
 #include "ThreadPool.h"
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 
 class Engine
 {
@@ -14,16 +15,10 @@ private:
 	void Tick(int tick, float dt);
 	void Render(float tick, float dt);
 private:
-	std::mutex mutex;
-	bool rendering = false;
-	std::thread controlThread;
-	std::thread renderThread;
-	std::mutex renderMutex;
-	std::condition_variable renderCondVar;
-private:
 	std::unique_ptr<Window> window = std::make_unique<Window>("SpaceGame");
 	std::unique_ptr<ThreadPool> threadPool = std::make_unique<ThreadPool>(1, 1);
-	bool running = true;
+	std::thread controlThread;
+	std::atomic<bool> running = true;
 private:
 	const float maxFrameRate = 666;
 	const float maxFrameTime = 1000.0f / maxFrameRate;

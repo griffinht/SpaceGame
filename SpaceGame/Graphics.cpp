@@ -24,19 +24,16 @@ Graphics::Graphics(HWND hWnd)
 
 void Graphics::Present(UINT syncInterval, UINT flags)
 {
-	if (presentReady)
+	HRESULT hr;
+	if (FAILED(hr = pSwap->Present(syncInterval, flags)))
 	{
-		HRESULT hr;
-		if (FAILED(hr = pSwap->Present(syncInterval, flags)))
+		if (hr == DXGI_ERROR_DEVICE_REMOVED)
 		{
-			if (hr == DXGI_ERROR_DEVICE_REMOVED)
-			{
-				throw GRAPHICS_DEVICE_REMOVED_EXCEPT(pDevice->GetDeviceRemovedReason());
-			}
-			else
-			{
-				GRAPHICS_THROW_INFO(hr);
-			}
+			throw GRAPHICS_DEVICE_REMOVED_EXCEPT(pDevice->GetDeviceRemovedReason());
+		}
+		else
+		{
+			GRAPHICS_THROW_INFO(hr);
 		}
 	}
 }
@@ -84,30 +81,6 @@ void Graphics::CreateDevice()
 		&featureLevel,
 		context.ReleaseAndGetAddressOf()
 	));
-
-#ifndef NDEBUG
-	WRL::ComPtr<ID3D11Debug> d3dDebug;
-	if (SUCCEEDED(device.As(&d3dDebug)))
-	{
-		WRL::ComPtr<ID3D11InfoQueue> d3dInfoQueue;
-		if (SUCCEEDED(d3dDebug.As(&d3dInfoQueue)))
-		{
-#ifdef _DEBUG
-			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
-			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
-#endif
-			D3D11_MESSAGE_ID hide[] =
-			{
-				D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
-				// TODO: Add more message IDs here as needed.
-			};
-			D3D11_INFO_QUEUE_FILTER filter = {};
-			filter.DenyList.NumIDs = _countof(hide);
-			filter.DenyList.pIDList = hide;
-			d3dInfoQueue->AddStorageFilterEntries(&filter);
-		}
-	}
-#endif
 
 	GRAPHICS_THROW_INFO(device.As(&pDevice));
 	GRAPHICS_THROW_INFO(context.As(&pContext));
@@ -217,6 +190,7 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 {
 	if (pSwap)
 	{
+		std::lock_guard<std::mutex> lockGuard(graphicsMutex);
 		if (width > 0)
 		{
 			backBufferWidth = width;
@@ -225,7 +199,7 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 		{
 			backBufferHeight = height;
 		}
-		
+
 		pContext->OMGetRenderTargets(0, 0, 0);
 		pTarget->Release();
 

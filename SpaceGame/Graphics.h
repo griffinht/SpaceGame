@@ -7,7 +7,7 @@
 #include <vector>
 #include <wrl.h>
 #include "DXGIInfoManager.h"
-#include <atomic>
+#include <shared_mutex>
 
 class Graphics
 {
@@ -22,8 +22,8 @@ public:
 	void ResizeBuffers(UINT width, UINT height);
 	void drawTriangle(float angle, float x, float y);
 	void OnDeviceLost();
+	std::mutex graphicsMutex;
 private:
-	std::atomic<bool> presentReady = true;
 	HWND hWnd;
 	DxgiInfoManager infoManager;
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;

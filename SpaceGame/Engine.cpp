@@ -12,7 +12,6 @@ Engine::Engine()
 	{
 		if (msg.message == WM_QUIT)
 		{
-			std::lock_guard<std::mutex> lockGuard(mutex);
 			running = false;
 			break;
 		}
@@ -34,7 +33,6 @@ void Engine::ControlLoop()
 	while (true)
 	{
 		{
-			std::lock_guard<std::mutex> lockGuard(mutex);
 			if (!running)
 			{
 				break;
@@ -67,16 +65,12 @@ void Engine::Tick(int tick, float dt)
 	OutputDebugString(std::to_string(1000.0f / dt).c_str());
 	OutputDebugString("\n");
 	*/
-	std::unique_lock<std::mutex> uniqueLock(mutex);
+
 	//todo tick here
 }
 
 void Engine::Render(float tick, float dt)
 {
-	{
-		std::unique_lock<std::mutex> uniqueLock(mutex);
-		//todo get all variables and stuff needed for draw
-	}
 	/*
 	OutputDebugString("DRAWING: ");
 	OutputDebugString(std::to_string(tick).c_str());
@@ -87,6 +81,7 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString("\n");
 	*/
 	try {
+		std::lock_guard<std::mutex> lockGuard(window->Graphics().graphicsMutex);
 		window->Graphics().Clear(0.0f, 1.0f, 0.0f);
 		window->Graphics().drawTriangle(tick / 60, //60 is a random constant i think
 			0, 
