@@ -2,8 +2,9 @@
 #include <sstream>
 #include "WindowThrowMacros.h"
 
-Window::Window(const char* name)
+Window::Window(const char* name, DWORD targetWindowState)
 {
+	this->targetWindowState = targetWindowState;
 	hInstance = GetModuleHandle(nullptr);
 
 	// window class
@@ -30,7 +31,24 @@ Window::Window(const char* name)
 	rect.bottom = 720;
 
 	DWORD dwExStyle = 0;
-	DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX;
+	DWORD dwStyle;
+	if (targetWindowState & WINDOWED)
+	{
+		dwStyle = WS_OVERLAPPEDWINDOW;
+	}
+	else if (targetWindowState & BORDERLESS_WINDOW)
+	{
+		dwStyle = 0;
+	}
+	else if (targetWindowState & FULLSCREEN)
+	{
+		dwStyle = 0;
+	}
+	else
+	{
+		dwStyle = WS_OVERLAPPEDWINDOW;
+	}
+
 	AdjustWindowRectEx(&rect, dwStyle, false, dwExStyle);
 	//window instance
 	hWnd = CreateWindowEx(
@@ -48,14 +66,26 @@ Window::Window(const char* name)
 		static_cast<LPVOID>(this)
 	);
 
+	pGraphics = std::make_unique<::Graphics>(hWnd);
+
 	if (hWnd == nullptr)
 	{
 		throw WINDOW_LAST_EXCEPTION();
 	}
 
-	ShowWindow(hWnd, SW_SHOW);
-
-	pGraphics = std::make_unique<::Graphics>(hWnd);
+	if (targetWindowState & WINDOWED)
+	{
+		ShowWindow(hWnd, SW_MAXIMIZE);
+	}
+	else if (targetWindowState & BORDERLESS_WINDOW)
+	{
+		ShowWindow(hWnd, SW_MAXIMIZE);
+	}
+	else if (targetWindowState & FULLSCREEN)
+	{
+		ShowWindow(hWnd, SW_MAXIMIZE);
+		Graphics().SetFullscreenState(true);
+	}
 }
 
 Window::~Window()
@@ -131,6 +161,53 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		{
 			Graphics().ResizeBuffers(LOWORD(lParam), HIWORD(lParam));
 		}
+		break;
+	case WM_ACTIVATE:
+		OutputDebugString("ACTIVE::");
+		OutputDebugString(std::to_string(wParam).c_str());
+		if (targetWindowState & FULLSCREEN)
+		{
+			if (wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
+			{
+				Graphics().SetFullscreenState(true);
+			}
+			else if(wParam == WA_INACTIVE)
+			{
+				Graphics().SetFullscreenState(false);
+				/*
+				long dwStyle = WS_OVERLAPPEDWINDOW;
+				
+				LONG lStyle = GetWindowLong(hWnd, GWL_STYLE);
+				lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+				SetWindowLong(hWnd, GWL_STYLE, lStyle);
+				SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+				
+				*/
+				//SendMessage(hWnd, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+				
+				//CREATESTRUCT* pCS = reinterpret_cast<CREATESTRUCT*>(lParam);
+				//LPVOID pThis = pCS->lpCreateParams;
+				//SetWindowLongPtrW(hWnd, 0, reinterpret_cast<LONG_PTR>(pThis));
+				//SetWindowLongPtr(hWnd, GWL_STYLE, (LONG_PTR)&dwStyle);
+				//todo change to see task bar maybe title bar?
+				//ShowWindow(hWnd, SW_MAXIMIZE);
+			}
+		}
+		else if (targetWindowState & BORDERLESS_WINDOW)
+		{
+			if (wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
+			{
+				//SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+			}
+			else if (wParam == WA_INACTIVE)
+			{
+				//SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+			}
+		}
+	default:
+		//OutputDebugString(std::to_string(msg).c_str());
+		//OutputDebugString("\n");
+		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }

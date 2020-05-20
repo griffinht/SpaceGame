@@ -190,6 +190,7 @@ void Graphics::SetFullscreenState(bool fullscreen)
 {
 	HRESULT hr;
 	GRAPHICS_THROW_INFO(pSwap->SetFullscreenState(fullscreen, nullptr));
+	ResizeBuffers(0, 0);
 }
 
 void Graphics::ResizeBuffers(UINT width, UINT height)

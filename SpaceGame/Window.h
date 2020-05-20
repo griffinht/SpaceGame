@@ -12,12 +12,18 @@
 class Window
 {
 public:
-	Window(const char* name);
+	Window(const char* name, DWORD targetWindowState);
 	~Window();
 	Graphics& Graphics();
 	void SetTitle(const char* name);
 	Mouse mouse;
 	Keyboard keyboard;
+	enum
+	{
+		WINDOWED = 0x1,
+		BORDERLESS_WINDOW = 0x2,
+		FULLSCREEN = 0x4
+	};
 private:
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -25,7 +31,8 @@ private:
 	HINSTANCE hInstance;
 	HWND hWnd;
 	std::unique_ptr<::Graphics> pGraphics;
-	
+	DWORD targetWindowState;
+	bool noFocus = false;
 public:
 	class Exception : public EngineException
 	{

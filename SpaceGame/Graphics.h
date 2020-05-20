@@ -23,6 +23,7 @@ public:
 	void drawTriangle(float angle, float x, float y);
 	void OnDeviceLost();
 	void ReportLiveObjects();
+	void SetScreenState(DWORD screenState);
 private:
 	std::mutex mutex;
 	HWND hWnd;
@@ -32,6 +33,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+	DWORD screenState = 0;
+	enum
+	{
+		WINDOWED = 0x1,
+		FULLSCREEN = 0x2
+	};
 private:
 	UINT backBufferWidth;
 	UINT backBufferHeight;
