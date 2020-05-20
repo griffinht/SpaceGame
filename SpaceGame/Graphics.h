@@ -13,7 +13,7 @@ class Graphics
 {
 public:
 	Graphics(HWND hWnd);
-	~Graphics() = default;
+	~Graphics();
 	void Present(UINT syncInterval, UINT flags);
 	void Clear(float red, float green, float blue);
 	void CreateDevice();
@@ -22,6 +22,7 @@ public:
 	void ResizeBuffers(UINT width, UINT height);
 	void drawTriangle(float angle, float x, float y);
 	void OnDeviceLost();
+	void ReportLiveObjects();
 private:
 	std::mutex mutex;
 	HWND hWnd;

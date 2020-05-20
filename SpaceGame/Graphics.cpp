@@ -22,6 +22,11 @@ Graphics::Graphics(HWND hWnd)
 	CreateResources();
 }
 
+Graphics::~Graphics()
+{
+	pSwap->SetFullscreenState(false, nullptr);
+}
+
 void Graphics::Present(UINT syncInterval, UINT flags)
 {
 	HRESULT hr;
@@ -201,7 +206,7 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 			backBufferHeight = height;
 		}
 
-		pContext->OMGetRenderTargets(0, 0, 0);
+		pContext->OMSetRenderTargets(0, 0, 0);//idk if this does anything
 		pTarget->Release();
 
 		HRESULT hr;
@@ -210,6 +215,7 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 		WRL::ComPtr<ID3D11Texture2D> backBuffer;
 		GRAPHICS_THROW_INFO(pSwap->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf())));
 		GRAPHICS_THROW_INFO(pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, pTarget.GetAddressOf()));
+
 		CD3D11_TEXTURE2D_DESC depthStencilDesc(depthBufferFormat, backBufferWidth, backBufferHeight, 1, 1, D3D11_BIND_DEPTH_STENCIL);
 		WRL::ComPtr<ID3D11Texture2D> depthStencil;
 		GRAPHICS_THROW_INFO(pDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencil.GetAddressOf()));
@@ -414,6 +420,13 @@ void Graphics::OnDeviceLost()
 	CreateDevice();
 
 	CreateResources();
+}
+
+void Graphics::ReportLiveObjects()
+{
+	WRL::ComPtr<ID3D11Debug> pDebug;
+	pDevice->QueryInterface(pDebug.GetAddressOf());
+	pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL);
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) 
