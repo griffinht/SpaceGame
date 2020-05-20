@@ -1,6 +1,8 @@
 #include "Window.h"
 #include <sstream>
 #include "WindowThrowMacros.h"
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
 
 Window::Window(const char* name, DWORD targetWindowState)
 {
@@ -38,11 +40,11 @@ Window::Window(const char* name, DWORD targetWindowState)
 	}
 	else if (targetWindowState & BORDERLESS_WINDOW)
 	{
-		dwStyle = 0;
+		dwStyle = WS_POPUP;
 	}
 	else if (targetWindowState & FULLSCREEN)
 	{
-		dwStyle = 0;
+		dwStyle = WS_POPUP;
 	}
 	else
 	{
@@ -174,22 +176,7 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			else if(wParam == WA_INACTIVE)
 			{
 				Graphics().SetFullscreenState(false);
-				/*
-				long dwStyle = WS_OVERLAPPEDWINDOW;
-				
-				LONG lStyle = GetWindowLong(hWnd, GWL_STYLE);
-				lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
-				SetWindowLong(hWnd, GWL_STYLE, lStyle);
-				SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-				
-				*/
-				//SendMessage(hWnd, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
-				
-				//CREATESTRUCT* pCS = reinterpret_cast<CREATESTRUCT*>(lParam);
-				//LPVOID pThis = pCS->lpCreateParams;
-				//SetWindowLongPtrW(hWnd, 0, reinterpret_cast<LONG_PTR>(pThis));
-				//SetWindowLongPtr(hWnd, GWL_STYLE, (LONG_PTR)&dwStyle);
-				//todo change to see task bar maybe title bar?
+				SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 				//ShowWindow(hWnd, SW_MAXIMIZE);
 			}
 		}
