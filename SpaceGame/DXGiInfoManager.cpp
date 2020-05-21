@@ -10,6 +10,9 @@
 #pragma comment(lib, "dxguid.lib")
 
 
+int resizeError = 0;
+int checks = 0;
+
 DxgiInfoManager::DxgiInfoManager()
 {
 	typedef HRESULT(WINAPI* DXGIGetDebugInterface)(REFIID, void**);
@@ -47,8 +50,24 @@ std::vector<std::string> DxgiInfoManager::GetMessages() const
 		GRAPHICS_THROW_NOINFO(pDxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL, i, pMessage, &messageLength));
 		OutputDebugString(pMessage->pDescription);
 		messages.emplace_back(pMessage->pDescription);
+		if (pMessage->ID == 117)
+		{
+			resizeError++;
+		}
 	}
 
 	pDxgiInfoQueue->ClearStoredMessages(DXGI_DEBUG_ALL);
 	return messages;
+}
+
+bool DxgiInfoManager::CheckResize()
+{
+	checks++;
+	if (checks > 2)
+	{
+		resizeError = 0;
+		checks = 0;
+	}
+	bool ret = resizeError > 1;
+	return ret;
 }

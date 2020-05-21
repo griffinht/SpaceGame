@@ -41,6 +41,7 @@ private:
 	HWND hWnd;
 	DxgiInfoManager infoManager;
 	DirectX::XMMATRIX projection;
+	BOOL wasFullscreen;
 private:
 	UINT backBufferWidth;
 	UINT backBufferHeight;
