@@ -17,6 +17,10 @@ ThreadPool::~ThreadPool()
 		shutdown = true;
 		condVar.notify_all();
 	}
+    for (std::thread &thread : threads)
+    {
+        thread.join();
+    }
 }
 
 void ThreadPool::QueueJob(std::function<void(void)> function)

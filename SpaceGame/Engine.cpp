@@ -37,6 +37,8 @@ Engine::Engine()
 			DispatchMessage(&msg);
 		}
 	}
+	running = false;
+	controlThread.join();
 	std::exit((int)msg.wParam);
 }
 
@@ -71,6 +73,7 @@ void Engine::ControlLoop()
 			lastRender = now;
 		}
 	}
+	threadPool->~ThreadPool();
 }
 void Engine::Tick(int tick, float dt)
 {

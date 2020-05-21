@@ -268,6 +268,16 @@ void Graphics::ReportLiveObjects()
 	pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL);
 }
 
+UINT Graphics::GetBackBufferWidth()
+{
+	return backBufferWidth;
+}
+
+UINT Graphics::GetBackBufferHeight()
+{
+	return backBufferHeight;
+}
+
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMessages) 
 	:
 	Exception(line, file),

@@ -28,6 +28,8 @@ public:
 	DirectX::XMMATRIX GetProjection() const;
 	void OnDeviceLost();
 	void ReportLiveObjects();
+	UINT GetBackBufferWidth();
+	UINT GetBackBufferHeight();
 private:
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> pSwap;
