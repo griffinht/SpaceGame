@@ -23,15 +23,16 @@ public:
 	void drawTriangle(float angle, float x, float y);
 	void OnDeviceLost();
 	void ReportLiveObjects();
-private:
-	std::mutex mutex;
-	HWND hWnd;
-	DxgiInfoManager infoManager;
+public:
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> pSwap;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+private:
+	std::mutex mutex;
+	HWND hWnd;
+	DxgiInfoManager infoManager;
 private:
 	UINT backBufferWidth;
 	UINT backBufferHeight;
