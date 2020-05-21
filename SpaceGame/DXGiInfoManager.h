@@ -12,7 +12,6 @@ public:
 	DxgiInfoManager();
 	~DxgiInfoManager() = default;
 	std::vector<std::string> GetMessages() const;
-	bool CheckResize();
 private:
 	Microsoft::WRL::ComPtr<IDXGIInfoQueue> pDxgiInfoQueue;
 };

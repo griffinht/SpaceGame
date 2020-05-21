@@ -55,11 +55,6 @@ void Graphics::Present(UINT syncInterval, UINT flags)
 
 void Graphics::Clear(float red, float green, float blue)
 {
-	if (infoManager.CheckResize())
-	{
-		OutputDebugString("FIXING\n");
-		//ResizeBuffers(0, 0);
-	}
 	std::lock_guard<std::mutex> lockGuard(mutex);
 	const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
@@ -205,7 +200,6 @@ void Graphics::SetFullscreenState(bool fullscreen)
 {
 	HRESULT hr;
 	GRAPHICS_THROW_INFO(pSwap->SetFullscreenState(fullscreen, nullptr));
-	//ResizeBuffers(0, 0);
 }
 
 void Graphics::ResizeBuffers(UINT width, UINT height)
