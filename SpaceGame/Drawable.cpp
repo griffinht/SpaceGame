@@ -11,6 +11,11 @@ void Drawable::Draw(Graphics& graphics) const
 		b->Bind(graphics);
 	}
 
+	for (auto& b : GetStaticBinds())
+	{
+		b->Bind(graphics);
+	}
+
 	graphics.DrawIndexed(pIndexBuffer->GetCount());
 }
 

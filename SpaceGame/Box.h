@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Drawable.h"
+#include "DrawableBase.h"
 
-class Box : public Drawable
+class Box : public DrawableBase<Box>
 {
 public:
 	Box(Graphics& graphics);
