@@ -6,12 +6,12 @@
 template<class T>
 class DrawableBase : public Drawable
 {
-public:
-	bool IsStaticInitialized() const
+protected:
+	static bool IsStaticInitialized()
 	{
 		return !staticBinds.empty();
 	}
-	void AddStaticBind(std::unique_ptr<Bindable> bind)
+	static void AddStaticBind(std::unique_ptr<Bindable> bind)
 	{
 		staticBinds.push_back(std::move(bind));
 	}
