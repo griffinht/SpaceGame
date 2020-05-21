@@ -21,6 +21,17 @@ public:
 		pIndexBuffer = ibuf.get();
 		staticBinds.push_back(std::move(ibuf));
 	}
+	void SetIndexFromStatic()
+	{
+		for (const auto& b : staticBinds)
+		{
+			if (const auto p = dynamic_cast<IndexBuffer*>(b.get()))
+			{
+				pIndexBuffer = p;
+				return;
+			}
+		}
+	}
 private:
 	const std::vector<std::unique_ptr<Bindable>>& GetStaticBinds() const override
 	{
