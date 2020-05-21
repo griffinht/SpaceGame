@@ -1,14 +1,14 @@
 #include "PixelShader.h"
 
-PixelShader::PixelShader(Graphics& graphics)
+PixelShader::PixelShader(Graphics& graphics, const std::wstring& path)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-	HRESULT hr;
-	GRAPHICS_THROW_INFO(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
-	GRAPHICS_THROW_INFO(graphics.pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
+	INFO_MANAGER(graphics);
+	GRAPHICS_THROW_INFO(D3DReadFileToBlob(path.c_str(), &pBlob));
+	GRAPHICS_THROW_INFO(GetDevice(graphics)->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
 }
 
 void PixelShader::Bind(Graphics& graphics)
 {
-	graphics.pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+	GetContext(graphics)->PSSetShader(pPixelShader.Get(), nullptr, 0u);
 }

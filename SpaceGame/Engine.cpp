@@ -7,6 +7,14 @@ Engine::Engine()
 {
 	controlThread = std::thread(&Engine::ControlLoop, this);
 
+	for (auto i = 0; i < 1; i++)
+	{
+		drawables.push_back(std::make_unique<Box>(
+			window->Graphics()
+		));
+	}
+	window->Graphics().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));//wrong
+
 	MSG msg;
 	while (GetMessage(&msg, nullptr, 0, 0) || true)
 	{
@@ -82,12 +90,12 @@ void Engine::Render(float tick, float dt)
 	*/
 	try {
 		window->Graphics().Clear(0.0f, 1.0f, 0.0f);
-		window->Graphics().drawTriangle(tick / 60, //60 is a random constant i think
-			0, 
-			0);
-		window->Graphics().drawTriangle(tick / 60,
-			window->mouse.GetPosX() / 640.0f - 1.0f,
-			-window->mouse.GetPosY() / 360.0f + 1.0f);
+		for (auto &d : drawables)
+		{
+			d->Update(dt);
+
+			d->Draw(window->Graphics());
+		}
 		window->Graphics().Present(1, 0);//this can wait for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
 	}
 	catch (Graphics::InfoException & e)

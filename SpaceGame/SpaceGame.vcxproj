@@ -162,7 +162,9 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="Bindable.cpp" />
+    <ClCompile Include="Box.cpp" />
+    <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DXGiInfoManager.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="EngineException.cpp" />
@@ -173,6 +175,8 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="Topology.cpp" />
+    <ClCompile Include="TransformConstantBuffer.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -180,7 +184,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bindable.h" />
-    <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="BindableCommon.h" />
+    <ClInclude Include="Box.h" />
+    <ClInclude Include="ConstantBuffers.h" />
+    <ClInclude Include="Drawable.h" />
     <ClInclude Include="DXGiInfoManager.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EngineException.h" />
@@ -192,6 +199,8 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="Topology.h" />
+    <ClInclude Include="TransformConstantBuffer.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Window.h" />

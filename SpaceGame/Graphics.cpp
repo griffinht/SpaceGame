@@ -231,75 +231,19 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 	}
 }
 
-void Graphics::drawTriangle(float angle, float x, float z)
+void Graphics::DrawIndexed(UINT count)
 {
-	std::lock_guard<std::mutex> lockGuard(mutex);
-	HRESULT hr;
+	GRAPHICS_THROW_INFO_ONLY(pContext->DrawIndexed(count, 0u, 0u));
+}
 
-	struct Vertex
-	{
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		} pos;
-	};
+void Graphics::SetProjection(DirectX::FXMMATRIX projection)
+{
+	this->projection = projection;
+}
 
-
-	// create constant buffer for transformation matrix
-	struct ConstantBufferStruct
-	{
-		DirectX::XMMATRIX transform;
-	};
-	const ConstantBuffer cb =//todo replace with actual aspect ratio
-	{
-		{
-			DX::XMMatrixTranspose(
-				DX::XMMatrixRotationZ(angle) *
-				DX::XMMatrixRotationX(angle) *
-				DX::XMMatrixTranslation(x, 0.0f, z + 4.0f) *
-				DX::XMMatrixPerspectiveLH(1.0f, (float)backBufferHeight/(float)backBufferWidth, 0.5f, 10.0f)
-			)
-		}
-	};
-
-
-	struct ConstantBuffer2
-	{
-		struct
-		{
-			float r;
-			float g;
-			float b;
-			float a;
-		} face_colors[6];
-	};
-	const ConstantBuffer2 cb2 =
-	{
-		{
-			{1.0f,0.0f,1.0f},
-			{1.0f,0.0f,0.0f},
-			{0.0f,1.0f,0.0f},
-			{0.0f,0.0f,1.0f},
-			{1.0f,1.0f,0.0f},
-			{0.0f,1.0f,1.0f}
-		}
-	};
-
-	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-
-	// input
-	WRL::ComPtr<ID3D11InputLayout> pInputLayout;
-	const D3D11_INPUT_ELEMENT_DESC ied[] =
-	{
-		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
-
-	// set primitive to triangle list
-	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	GRAPHICS_THROW_INFO_ONLY(pContext->DrawIndexed((UINT)std::size(indices), 0u, 0u));
+DirectX::XMMATRIX Graphics::GetProjection() const
+{
+	return projection;
 }
 
 void Graphics::OnDeviceLost()

@@ -8,9 +8,12 @@
 #include <wrl.h>
 #include "DXGIInfoManager.h"
 #include <mutex>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
 
 class Graphics
 {
+	friend class Bindable;
 public:
 	Graphics(HWND hWnd);
 	~Graphics();
@@ -20,10 +23,12 @@ public:
 	void CreateResources();
 	void SetFullscreenState(bool fullscreen);
 	void ResizeBuffers(UINT width, UINT height);
-	void drawTriangle(float angle, float x, float y);
+	void DrawIndexed(UINT count);
+	void SetProjection(DirectX::FXMMATRIX projection);
+	DirectX::XMMATRIX GetProjection() const;
 	void OnDeviceLost();
 	void ReportLiveObjects();
-public:
+private:
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> pSwap;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
@@ -33,6 +38,7 @@ private:
 	std::mutex mutex;
 	HWND hWnd;
 	DxgiInfoManager infoManager;
+	DirectX::XMMATRIX projection;
 private:
 	UINT backBufferWidth;
 	UINT backBufferHeight;

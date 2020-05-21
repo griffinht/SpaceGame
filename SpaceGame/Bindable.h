@@ -1,24 +1,15 @@
 #pragma once
 
 #include "Graphics.h"
-#include "EngineException.h"
-#include "DXGIInfoManager.h"
 #include "GraphicsThrowMacros.h"
-#include <DirectXMath.h>
 
 class Bindable
 {
 public:
-	virtual void Bind(Graphics& graphics);
-	struct Vertex
-	{
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		} pos;
-	};
+	virtual void Bind(Graphics& gfx) = 0;
+	virtual ~Bindable() = default;
 protected:
-	DxgiInfoManager infoManager;
+	static ID3D11DeviceContext* GetContext(Graphics& graphics);
+	static ID3D11Device* GetDevice(Graphics& graphics);
+	static DxgiInfoManager& GetInfoManager(Graphics& graphics);
 };

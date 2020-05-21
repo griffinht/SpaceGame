@@ -8,8 +8,10 @@
 class VertexShader : public Bindable
 {
 public:
-	VertexShader(Graphics& graphics);
+	VertexShader(Graphics& graphics, const std::wstring& path);
 	void Bind(Graphics& graphics) override;
-private:
+	ID3DBlob* GetBytecode() const;
+protected:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
+	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
 };

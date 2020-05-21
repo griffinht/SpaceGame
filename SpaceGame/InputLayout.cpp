@@ -2,17 +2,16 @@
 
 InputLayout::InputLayout(Graphics& graphics, const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, ID3DBlob* pVertexShaderBytecode)
 {
-	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-	HRESULT hr;
-	(graphics.pDevice->CreateInputLayout(
+	INFO_MANAGER(graphics);
+	(GetDevice(graphics)->CreateInputLayout(
 		layout.data(), (UINT)layout.size(),
-		pBlob->GetBufferPointer(),
-		pBlob->GetBufferSize(),
+		pVertexShaderBytecode->GetBufferPointer(),
+		pVertexShaderBytecode->GetBufferSize(),
 		&pInputLayout
 	));
 }
 
 void InputLayout::Bind(Graphics& graphics)
 {
-	graphics.pContext->IASetInputLayout(pInputLayout.Get());
+	GetContext(graphics)->IASetInputLayout(pInputLayout.Get());
 }

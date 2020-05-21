@@ -2,6 +2,7 @@
 
 #include "Window.h"
 #include "ThreadPool.h"
+#include "Box.h"
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
@@ -25,4 +26,6 @@ private:
 	const float tickRate = 60;
 	const float tickTime = 1000.0f / tickRate; // how long each tick takes in miliseconds
 	const bool vSync = true;
+private:
+	std::vector<std::unique_ptr<Drawable>> drawables;
 };

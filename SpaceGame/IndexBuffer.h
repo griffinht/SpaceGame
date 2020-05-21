@@ -5,8 +5,10 @@
 class IndexBuffer : public Bindable
 {
 public:
-	IndexBuffer(Graphics& graphics, const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, ID3DBlob* pVertexShaderBytecode);
+	IndexBuffer(Graphics& graphics, const std::vector<unsigned short>& indices);
 	void Bind(Graphics& graphics) override;
+	UINT GetCount() const;
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pIndexBuffer;
+	UINT count;
 };

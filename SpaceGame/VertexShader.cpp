@@ -1,14 +1,20 @@
 #include "VertexShader.h"
 
-VertexShader::VertexShader(Graphics& graphics)
+VertexShader::VertexShader(Graphics& graphics, const std::wstring& path)
 {
-	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-	HRESULT hr;
-	GRAPHICS_THROW_INFO(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
-	GRAPHICS_THROW_INFO(graphics.pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
+	
+
+	INFO_MANAGER(graphics);
+	GRAPHICS_THROW_INFO(D3DReadFileToBlob(path.c_str(), &pBlob));
+	GRAPHICS_THROW_INFO(GetDevice(graphics)->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
 }
 
 void VertexShader::Bind(Graphics& graphics)
 {
-	graphics.pContext->VSSetShader(pVertexShader.Get(), 0, 0);
+	GetContext(graphics)->VSSetShader(pVertexShader.Get(), 0, 0);
+}
+
+ID3DBlob* VertexShader::GetBytecode() const
+{
+	return pBlob.Get();
 }

@@ -8,7 +8,7 @@
 class PixelShader : public Bindable
 {
 public:
-	PixelShader(Graphics& graphics);
+	PixelShader(Graphics& graphics, const std::wstring& path);
 	void Bind(Graphics& graphics) override;
 private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
