@@ -1,5 +1,6 @@
 #include "Box.h"
 #include "BindableCommon.h"
+#include "Sphere.h"
 
 
 Box::Box(Graphics& graphics, std::mt19937& rng,
@@ -21,27 +22,17 @@ Box::Box(Graphics& graphics, std::mt19937& rng,
 {
 	if (!IsStaticInitialized())
 	{
+		namespace dx = DirectX;
+
 		struct Vertex
 		{
-			struct
-			{
-				float x;
-				float y;
-				float z;
-			} pos;
+			dx::XMFLOAT3 pos;
 		};
-		const std::vector<Vertex> vertices =
-		{
-			{ -1.0f,-1.0f,-1.0f },
-			{ 1.0f,-1.0f,-1.0f },
-			{ -1.0f,1.0f,-1.0f },
-			{ 1.0f,1.0f,-1.0f },
-			{ -1.0f,-1.0f,1.0f },
-			{ 1.0f,-1.0f,1.0f },
-			{ -1.0f,1.0f,1.0f },
-			{ 1.0f,1.0f,1.0f },
-		};
-		AddStaticBind(std::make_unique<VertexBuffer>(graphics, vertices));
+
+		auto model = Sphere::Make<Vertex>();
+		model.Transform(dx::XMMatrixScaling(1.0f, 1.0f, 1.2f));
+
+		AddStaticBind(std::make_unique<VertexBuffer>(graphics, model.vertices));
 
 		auto pvs = std::make_unique<VertexShader>(graphics, L"VertexShader.cso");
 		auto pvsbc = pvs->GetBytecode();
@@ -49,16 +40,7 @@ Box::Box(Graphics& graphics, std::mt19937& rng,
 
 		AddStaticBind(std::make_unique<PixelShader>(graphics, L"PixelShader.cso"));
 
-		const std::vector<unsigned short> indices =
-		{
-			0,2,1, 2,3,1,
-			1,3,5, 3,7,5,
-			2,6,3, 3,6,7,
-			4,5,7, 4,7,6,
-			0,4,2, 2,4,6,
-			0,1,4, 1,5,4
-		};
-		AddStaticIndexBuffer(std::make_unique<IndexBuffer>(graphics, indices));
+		AddStaticIndexBuffer(std::make_unique<IndexBuffer>(graphics, model.indices));
 
 		struct ConstantBuffer2
 		{
