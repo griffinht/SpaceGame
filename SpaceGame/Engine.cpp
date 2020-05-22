@@ -100,6 +100,7 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString("\n");
 	*/
 	try {
+		camera.Bind(window->Graphics());
 		window->Graphics().Clear(0.0f, 1.0f, 0.0f);
 		for (auto &d : drawables)
 		{

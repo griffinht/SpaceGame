@@ -6,6 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+#include "Camera.h"
 
 class Engine
 {
@@ -16,7 +17,7 @@ private:
 	void Tick(int tick, float dt);
 	void Render(float tick, float dt);
 private:
-	std::unique_ptr<Window> window = std::make_unique<Window>("SpaceGame", Window::FULLSCREEN);
+	std::unique_ptr<Window> window = std::make_unique<Window>("SpaceGame", Window::WINDOWED);
 	std::unique_ptr<ThreadPool> threadPool = std::make_unique<ThreadPool>(1, 1);
 	std::thread controlThread;
 	std::atomic<bool> running = true;
@@ -26,6 +27,7 @@ private:
 	const float tickRate = 60;
 	const float tickTime = 1000.0f / tickRate; // how long each tick takes in miliseconds
 	const bool vSync = true;
+	Camera camera;
 private:
 	std::vector<std::unique_ptr<Drawable>> drawables;
 };
