@@ -165,8 +165,6 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		}
 		break;
 	case WM_ACTIVATE:
-		OutputDebugString("ACTIVE::");
-		OutputDebugString(std::to_string(wParam).c_str());
 		if (targetWindowState & FULLSCREEN)
 		{
 			if (wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
