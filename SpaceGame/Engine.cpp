@@ -20,6 +20,7 @@ Engine::Engine()
 		));
 	}
 	window->Graphics().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));//wrong
+	//window->Graphics().SetProjection(camera.GetProjectionMatrix() * camera.GetViewMatrix());
 
 	controlThread = std::thread(&Engine::ControlLoop, this);
 
@@ -99,12 +100,14 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString(std::to_string(1000 / dt).c_str());
 	OutputDebugString("\n");
 	*/
+	POINTS pt = window->mouse.GetPosDelta();
+	camera.ChangeRotation(pt.x, pt.y, 0);
 	try {
-		camera.Bind(window->Graphics());
-		window->Graphics().Clear(0.0f, 1.0f, 0.0f);
+		//window->Graphics().SetProjection(camera.GetProjectionMatrix() * camera.GetViewMatrix());
+		window->Graphics().Clear(0.1f, 0.1f, 0.1f);
 		for (auto &d : drawables)
 		{
-			d->Update(dt / 100.0f);
+			d->Update(dt / 1000.0f);
 
 			d->Draw(window->Graphics());
 		}
@@ -123,4 +126,9 @@ void Engine::Render(float tick, float dt)
 		OutputDebugString(e.what());
 		PostQuitMessage(-1);
 	}
+}
+
+void Engine::Resize(int width, int height)
+{
+	camera.SetProjectionRect(DirectX::XMFLOAT4(-(width / 2.0f), width / 2.0f, -(height / 2.0f), height / 2.0f));
 }

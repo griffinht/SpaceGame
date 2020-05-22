@@ -1,6 +1,7 @@
 #include "Box.h"
 #include "BindableCommon.h"
 #include "Sphere.h"
+#include "Cube.h"
 
 
 Box::Box(Graphics& graphics, std::mt19937& rng,
@@ -29,8 +30,8 @@ Box::Box(Graphics& graphics, std::mt19937& rng,
 			dx::XMFLOAT3 pos;
 		};
 
-		auto model = Sphere::Make<Vertex>();
-		model.Transform(dx::XMMatrixScaling(1.0f, 1.0f, 1.2f));
+		auto model = Cube::Make<Vertex>();
+		//model.Transform(dx::XMMatrixScaling(1.0f, 1.0f, 1.2f));
 
 		AddStaticBind(std::make_unique<VertexBuffer>(graphics, model.vertices));
 

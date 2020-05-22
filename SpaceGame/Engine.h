@@ -16,6 +16,7 @@ private:
 	void ControlLoop();
 	void Tick(int tick, float dt);
 	void Render(float tick, float dt);
+	void Resize(int width, int height);
 private:
 	std::unique_ptr<Window> window = std::make_unique<Window>("SpaceGame", Window::WINDOWED);
 	std::unique_ptr<ThreadPool> threadPool = std::make_unique<ThreadPool>(1, 1);
