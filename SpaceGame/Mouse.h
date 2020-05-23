@@ -56,6 +56,4 @@ private:
 	bool rButtonPressed;
 	std::queue<Mouse::Event> events;
 	const int maxBufferSize = -1;
-private:
-	static POINTS AddPositions(POINTS p1, POINTS p2);
 };

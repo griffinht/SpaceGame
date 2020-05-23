@@ -47,22 +47,15 @@ std::optional<Mouse::Event> Mouse::GetEvent()
 	}
 }
 
-POINTS Mouse::AddPositions(POINTS p1, POINTS p2)
-{
-	return POINTS{ p1.x + p2.x, p1.y + p2.y};
-}
-
 void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 {
-	
-	
 	switch (type)
 	{
 	case Mouse::Event::Type::Move:
 		{
 			POINTS pt = MAKEPOINTS(lParam);
+			mousePositionDelta = { mousePositionDelta.x + pt.x - mousePosition.x, mousePositionDelta.y + pt.y - mousePosition.y };
 			mousePosition = pt;
-			mousePositionDelta = AddPositions(mousePositionDelta, pt);
 		}
 		break;
 	case Mouse::Event::Type::LButtonDown:
