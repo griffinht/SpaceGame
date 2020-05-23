@@ -4,7 +4,8 @@ InputLayout::InputLayout(Graphics& graphics, const std::vector<D3D11_INPUT_ELEME
 {
 	INFO_MANAGER(graphics);
 	GRAPHICS_THROW_INFO(GetDevice(graphics)->CreateInputLayout(
-		layout.data(), (UINT)layout.size(),
+		layout.data(), 
+		(UINT)layout.size(),
 		pVertexShaderBytecode->GetBufferPointer(),
 		pVertexShaderBytecode->GetBufferSize(),
 		&pInputLayout

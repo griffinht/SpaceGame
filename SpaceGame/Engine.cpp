@@ -111,6 +111,7 @@ void Engine::Render(float tick, float dt)
 
 			d->Draw(window->Graphics());
 		}
+		window->Graphics().DrawSomething();
 		window->Graphics().Present(1, 0);//this can wait for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
 	}
 	catch (Graphics::InfoException & e)

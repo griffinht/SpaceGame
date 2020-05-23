@@ -56,12 +56,12 @@ Box::Box(Graphics& graphics, std::mt19937& rng,
 		const ConstantBuffer2 cb2 =
 		{
 			{
-				{ 1.0f,0.0f,1.0f },
+				{ 0.0f,0.0f,0.0f },
 				{ 1.0f,0.0f,0.0f },
 				{ 0.0f,1.0f,0.0f },
-				{ 0.0f,0.0f,1.0f },
 				{ 1.0f,1.0f,0.0f },
-				{ 0.0f,1.0f,1.0f },
+				{ 0.0f,0.0f,1.0f },
+				{ 1.0f,0.0f,1.0f },
 			}
 		};
 		AddStaticBind(std::make_unique<PixelConstantBuffer<ConstantBuffer2>>(graphics, cb2));

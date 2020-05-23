@@ -216,7 +216,7 @@ void Graphics::ResizeBuffers(UINT width, UINT height)
 			backBufferHeight = height;
 		}
 
-		pContext->OMSetRenderTargets(0, 0, 0);//idk if this does anything
+		pContext->OMGetRenderTargets(0, 0, 0);//idk if this does anything
 		pTarget->Release();
 
 		HRESULT hr;
