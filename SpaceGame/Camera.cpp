@@ -32,11 +32,11 @@ void Camera::ChangePosition(float x, float y, float z)
 	position.z += z;
 }
 
-void Camera::ChangeRotation(float roll, float pitch, float yaw)
+void Camera::ChangeRotation(float pitch, float yaw, float roll)//should be between 0 and 1, will be converted to radians
 {
-	rotation.x = fmod(rotation.x + roll, M_PI);
-	rotation.y = fmod(rotation.y + pitch, M_PI);
-	rotation.z = fmod(rotation.z + yaw, M_PI);
+	rotation.x = fmod(rotation.x + (pitch * M_PI), M_PI);
+	rotation.y = fmod(rotation.y + (yaw * M_PI), M_PI);
+	rotation.z = fmod(rotation.z + (roll * M_PI), M_PI);
 }
 
 void Camera::ChangeZoom(float zoom)
