@@ -46,11 +46,18 @@ DirectX::XMMATRIX Camera::GetViewMatrix()
 {
 	using namespace DirectX;
 
-	XMVECTOR Eye = XMVectorSet(position.x, position.y, -1.0f, 0.0f);
-	XMVECTOR LookAt = XMVectorSet(position.x, position.y, 0.0f, 0.0f);
-	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR Eye = XMVectorSet(position.x, position.y, position.z, 0.0f);
 
-	return XMMatrixLookAtLH(Eye, LookAt, Up);
+	return 
+		XMMatrixLookAtLH(
+			Eye, 
+			Eye + XMVector3Transform(
+				XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
+				XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z)), 
+			XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) 
+		* XMMatrixPerspectiveLH(16, 9, 3, 100);
+	//return ;
+	//return XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f);
 }
 
 DirectX::XMMATRIX Camera::GetProjectionMatrix()
