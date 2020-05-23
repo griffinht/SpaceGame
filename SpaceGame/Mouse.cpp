@@ -19,16 +19,6 @@ POINTS Mouse::Event::GetPos()
 	return mousePosition;
 }
 
-int Mouse::Event::GetPosX()
-{
-	return mousePosition.x;
-}
-
-int Mouse::Event::GetPosY()
-{
-	return mousePosition.y;
-}
-
 WPARAM Mouse::Event::getWParam() 
 {
 	return wParam;
@@ -49,37 +39,6 @@ std::optional<Mouse::Event> Mouse::GetEvent()
 
 void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 {
-	switch (type)
-	{
-	case Mouse::Event::Type::Move:
-		{
-			POINTS pt = MAKEPOINTS(lParam);
-			mousePositionDelta = { mousePositionDelta.x + pt.x - mousePosition.x, mousePositionDelta.y + pt.y - mousePosition.y };
-			mousePosition = pt;
-		}
-		break;
-	case Mouse::Event::Type::LButtonDown:
-		lButtonPressed = true;
-		break;
-	case Mouse::Event::Type::LButtonUp:
-		lButtonPressed = false;
-		break;
-	case Mouse::Event::Type::MButtonDown:
-		mButtonPressed = true;
-		break;
-	case Mouse::Event::Type::MButtonUp:
-		mButtonPressed = false;
-		break;
-	case Mouse::Event::Type::RButtonDown:
-		rButtonPressed = true;
-		break;
-	case Mouse::Event::Type::RButtonUp:
-		rButtonPressed = false;
-		break;
-	case Mouse::Event::Type::MouseWheel:
-		mouseWheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
-		break;
-	}
 	events.push(Mouse::Event::Event(type, wParam, lParam));
 	while (maxBufferSize > 0 && events.size() > maxBufferSize)
 	{
@@ -92,14 +51,18 @@ POINTS Mouse::GetPos()
 	return mousePosition;
 }
 
-int Mouse::GetPosX()
+void Mouse::SetPos(POINTS pt)
 {
-	return mousePosition.x;
-}
-
-int Mouse::GetPosY()
-{
-	return mousePosition.y;
+	mousePositionDelta = { mousePositionDelta.x + pt.x - mousePosition.x, mousePositionDelta.y + pt.y - mousePosition.y };
+	if (constrained)
+	{
+		SetCursorPos(0, 0);
+		mousePosition = pt;
+	}
+	else
+	{
+		mousePosition = pt;
+	}
 }
 
 POINTS Mouse::GetPosDelta()
@@ -109,16 +72,6 @@ POINTS Mouse::GetPosDelta()
 	return d;
 }
 
-int Mouse::GetPosDeltaX()
-{
-	return mousePositionDelta.x;
-}
-
-int Mouse::GetPosDeltaY()
-{
-	return mousePositionDelta.y;
-}
-
 int Mouse::GetWheelDelta()
 {
 	int d = mouseWheelDelta;
@@ -126,9 +79,19 @@ int Mouse::GetWheelDelta()
 	return d;
 }
 
+void Mouse::SetWheelDelta(int delta)
+{
+	mouseWheelDelta += delta;
+}
+
 bool Mouse::LButtonPressed()
 {
 	return lButtonPressed;
+}
+
+void Mouse::SetLButtonPressed(bool pressed)
+{
+	lButtonPressed = pressed;
 }
 
 bool Mouse::MButtonPressed()
@@ -136,7 +99,28 @@ bool Mouse::MButtonPressed()
 	return mButtonPressed;
 }
 
+void Mouse::SetMButtonPressed(bool pressed)
+{
+	mButtonPressed = true;
+}
+
 bool Mouse::RButtonPressed()
 {
 	return rButtonPressed;
+}
+
+void Mouse::SetRButtonPressed(bool pressed)
+{
+	rButtonPressed = true;
+}
+
+void Mouse::SetConstrained(bool constrained)
+{
+	this->constrained = constrained;
+	ShowCursor(!constrained);
+}
+
+bool Mouse::Constrained()
+{
+	return constrained;
 }

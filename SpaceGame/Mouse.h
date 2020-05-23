@@ -25,8 +25,6 @@ public:
 		Event(Type type, WPARAM wParam, LPARAM lParam);
 		Type getType();
 		POINTS GetPos();
-		int GetPosX();
-		int GetPosY();
 		WPARAM getWParam();
 	private:
 		Type type;
@@ -36,20 +34,23 @@ public:
 public:
 	void OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam);
 	POINTS GetPos();
-	int GetPosX();
-	int GetPosY();
+	void SetPos(POINTS pt);
 	POINTS GetPosDelta();
-	int GetPosDeltaX();
-	int GetPosDeltaY();
 	int GetWheelDelta();
+	void SetWheelDelta(int delta);
 	bool LButtonPressed();
+	void SetLButtonPressed(bool pressed);
 	bool MButtonPressed();
+	void SetMButtonPressed(bool pressed);
 	bool RButtonPressed();
+	void SetRButtonPressed(bool pressed);
+	bool Constrained();
+	void SetConstrained(bool constrained);
 private:
 	std::optional<Mouse::Event> GetEvent();
 	POINTS mousePosition;
 	POINTS mousePositionDelta;
-	int sdf;
+	bool constrained = false;
 	int mouseWheelDelta;
 	bool lButtonPressed;
 	bool mButtonPressed;
