@@ -1,4 +1,6 @@
 #include "Camera.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 Camera::Camera()
 {}
@@ -30,11 +32,11 @@ void Camera::ChangePosition(float x, float y, float z)
 	position.z += z;
 }
 
-void Camera::ChangeRotation(float pitch, float yaw, float roll)
+void Camera::ChangeRotation(float roll, float pitch, float yaw)
 {
-	rotation.x += pitch;
-	rotation.y += yaw;
-	rotation.z += roll;
+	rotation.x = fmod(rotation.x + roll, M_PI);
+	rotation.y = fmod(rotation.y + pitch, M_PI);
+	rotation.z = fmod(rotation.z + yaw, M_PI);
 }
 
 void Camera::ChangeZoom(float zoom)

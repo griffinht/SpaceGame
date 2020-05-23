@@ -93,13 +93,21 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString("DRAWING: ");
 	OutputDebugString(std::to_string(tick).c_str());
 	//OutputDebugString(", animate:");
-	//OutputDebugString(std::to_string(time / 60).c_str());
+	OutputDebugString(std::to_string(time / 60).c_str());
 	OutputDebugString(",");
 	OutputDebugString(std::to_string(1000 / dt).c_str());
 	OutputDebugString("\n");
 	*/
 	POINTS pt = window->mouse.GetPosDelta();
-	camera.ChangeRotation(((float)pt.x / (float)window->Graphics().GetBackBufferWidth()) / 100.0f, ((float)pt.y / (float)window->Graphics().GetBackBufferWidth()) / 100.0f, 0);
+	OutputDebugString(std::to_string(pt.x).c_str());
+	OutputDebugString(",");
+	OutputDebugString(std::to_string(pt.y).c_str());
+	OutputDebugString(" = ");
+	OutputDebugString(std::to_string((float)pt.y / (float)window->Graphics().GetBackBufferHeight()).c_str());
+	OutputDebugString(",");
+	OutputDebugString(std::to_string((float)pt.x / (float)window->Graphics().GetBackBufferWidth()).c_str());
+	OutputDebugString("\n");
+	camera.ChangeRotation(((float)pt.y / (float)window->Graphics().GetBackBufferHeight()), ((float)pt.x / (float)window->Graphics().GetBackBufferWidth()), 0);
 
 	try {
 		window->Graphics().SetProjection(camera.GetViewMatrix() * camera.GetProjectionMatrix());
