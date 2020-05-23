@@ -99,7 +99,8 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString("\n");
 	*/
 	POINTS pt = window->mouse.GetPosDelta();
-	camera.ChangeRotation(pt.x, pt.y, 0);
+	camera.ChangeRotation(((float)pt.x / (float)window->Graphics().GetBackBufferWidth()) / 100.0f, ((float)pt.y / (float)window->Graphics().GetBackBufferWidth()) / 100.0f, 0);
+
 	try {
 		window->Graphics().SetProjection(camera.GetViewMatrix() * camera.GetProjectionMatrix());
 		window->Graphics().Clear(0.1f, 0.1f, 0.1f);
