@@ -32,7 +32,9 @@ public:
 		WPARAM wParam;
 	};
 public:
+	Mouse();
 	void OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam);
+	void OnRawEvent(tagRAWMOUSE rawMouse);
 	POINTS GetPos();
 	POINTS GetPosDelta();
 	int GetWheelDelta();
@@ -47,7 +49,7 @@ private:
 	POINTS position;
 	POINTS positionDelta;
 	bool constrained = false;
-	bool rawInput = true;
+	bool rawInput = false;
 	int wheelDelta;
 	bool lButtonPressed;
 	bool mButtonPressed;

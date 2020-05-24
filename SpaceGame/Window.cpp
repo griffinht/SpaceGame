@@ -88,6 +88,8 @@ Window::Window(const char* name, DWORD targetWindowState)
 		ShowWindow(hWnd, SW_MAXIMIZE);
 		Graphics().SetFullscreenState(true);
 	}
+
+	mouse.SetRawInput(true);
 }
 
 Window::~Window()
@@ -172,6 +174,7 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		break;
 	case WM_MOUSEWHEEL:
 		mouse.OnEvent(Mouse::Event::Type::MouseWheel, wParam, lParam);
+		break;
 	case WM_SIZE:
 		POINTS pt = MAKEPOINTS(lParam);
 		if (pGraphics)
@@ -205,6 +208,46 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 				//SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
 			}
 		}
+		break;
+	case WM_INPUT:
+		{
+			UINT dwSize;
+			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &dwSize, sizeof(RAWINPUTHEADER));
+			LPBYTE lpb = new BYTE[dwSize];
+			if (lpb == NULL)
+			{
+				break;
+			}
+
+			if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+			{
+				OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
+			}
+
+			RAWINPUT* raw = (RAWINPUT*)lpb;
+
+			HRESULT hr; //todo error handle lol?
+			/*
+			if (raw->header.dwType == RIM_TYPEKEYBOARD)
+			{
+				hr = StringCchPrintf(szTempOutput, STRSAFE_MAX_CCH, TEXT(" Kbd: make=%04x Flags:%04x Reserved:%04x ExtraInformation:%08x, msg=%04x VK=%04x \n"),
+					raw->data.keyboard.MakeCode,
+					raw->data.keyboard.Flags,
+					raw->data.keyboard.Reserved,
+					raw->data.keyboard.ExtraInformation,
+					raw->data.keyboard.Message,
+					raw->data.keyboard.VKey);
+				OutputDebugString(szTempOutput);
+			}
+			else*/
+			if (raw->header.dwType == RIM_TYPEMOUSE)
+			{
+				mouse.OnRawEvent(raw->data.mouse);
+			}
+
+			delete[] lpb;
+		}
+		break;
 	default:
 		//OutputDebugString(std::to_string(msg).c_str());
 		//OutputDebugString("\n");
