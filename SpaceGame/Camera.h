@@ -20,6 +20,7 @@ public:
 	DirectX::XMMATRIX GetViewMatrix();
 	DirectX::XMMATRIX GetProjectionMatrix();
 private:
+	float NormalizeInRange(float norm, float min, float max);
 	DirectX::XMFLOAT3 position = DirectX::XMFLOAT3(0, 0, 0);
 	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0, 0, 0);
 	DirectX::XMFLOAT4 projectionRect = DirectX::XMFLOAT4(-640.0f, 640.0f, -310.0f, 310.0f);

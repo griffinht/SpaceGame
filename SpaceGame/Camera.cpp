@@ -32,11 +32,18 @@ void Camera::ChangePosition(float x, float y, float z)
 	position.z += z;
 }
 
-void Camera::ChangeRotation(float pitch, float yaw, float roll)//should be between 0 and 1, will be converted to radians
+void Camera::ChangeRotation(float pitch, float yaw, float roll)//should be between -1 and 1, will be converted to radians
 {
-	rotation.x = fmod(rotation.x + (pitch * M_PI), M_PI);
-	rotation.y = fmod(rotation.y + (yaw * M_PI), M_PI);
-	rotation.z = fmod(rotation.z + (roll * M_PI), M_PI);
+	OutputDebugString(std::to_string(rotation.x).c_str());
+	OutputDebugString(", ");
+	OutputDebugString(std::to_string(rotation.y).c_str());
+	OutputDebugString(", ");
+	OutputDebugString(std::to_string(rotation.z).c_str());
+	OutputDebugString("\n");
+	rotation.x += (pitch * M_PI * 2);
+	rotation.x = NormalizeInRange(rotation.x, -M_PI_2 + 0.0001f, M_PI_2 - 0.0001f);
+	rotation.y += (yaw * M_PI * 2);
+	rotation.z += (roll * M_PI * 2);
 }
 
 void Camera::ChangeZoom(float zoom)
@@ -72,4 +79,9 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix()
 		0.1f,
 		10.0f);
 		*/
+}
+
+float Camera::NormalizeInRange(float norm, float min, float max)
+{
+	return min(max(norm, min), max);
 }
