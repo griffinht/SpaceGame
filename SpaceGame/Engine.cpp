@@ -110,7 +110,23 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString("\n");
 	*/
 	camera.ChangeRotation((pt.second / (float)window->Graphics().GetBackBufferHeight()), (pt.first / (float)window->Graphics().GetBackBufferWidth()), 0);
-	
+	float x = 0, y = 0, z = 0;
+
+	if (window->keyboard.KeyPressed(0x44))//d
+		x += dt;
+	if (window->keyboard.KeyPressed(0x41))//a
+		x -= dt;
+	if (window->keyboard.KeyPressed(VK_SPACE))
+		y += dt;
+	if (window->keyboard.KeyPressed(VK_CONTROL))
+		y -= dt;
+	if (window->keyboard.KeyPressed(0x57))//w
+		z += dt;
+	if (window->keyboard.KeyPressed(0x53))//s
+		z -= dt;
+
+	camera.ChangePosition(x, y, z);
+
 	try {
 		window->Graphics().SetProjection(camera.GetViewMatrix() * camera.GetProjectionMatrix());
 		window->Graphics().Clear(0.1f, 0.1f, 0.1f);
