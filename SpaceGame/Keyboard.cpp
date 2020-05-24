@@ -1,25 +1,25 @@
 #include "Keyboard.h"
 
-Keyboard::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
+Keyboard::Event::Event(Type type, WPARAM key, LPARAM lParam)
 {
 	this->type = type;
-	this->wParam = wParam;
-	this->points = MAKEPOINTS(lParam);
+	this->key = (unsigned char)key;
+	this->lParam = lParam;
 }
 
-Keyboard::Event::Type Keyboard::Event::getType()
+Keyboard::Event::Type Keyboard::Event::GetType()
 {
 	return type;
 }
 
-POINTS Keyboard::Event::getPoints()
+unsigned char Keyboard::Event::GetKey()
 {
-	return points;
+	return key;
 }
 
-WPARAM Keyboard::Event::getWParam()
+LPARAM Keyboard::Event::GetLParam()
 {
-	return wParam;
+	return lParam;
 }
 
 std::optional<Keyboard::Event> Keyboard::GetEvent()

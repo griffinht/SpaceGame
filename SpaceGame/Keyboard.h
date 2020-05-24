@@ -18,13 +18,13 @@ public:
 		};
 	public:
 		Event(Type type, WPARAM wParam, LPARAM lParam);
-		Type getType();
-		POINTS getPoints();
-		WPARAM getWParam();
+		Type GetType();
+		unsigned char GetKey();
+		LPARAM GetLParam();
 	private:
 		Type type;
-		POINTS points;
-		WPARAM wParam;
+		unsigned char key;
+		LPARAM lParam;
 	};
 public:
 	Keyboard() = default;
