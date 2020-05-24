@@ -22,21 +22,19 @@ public:
 			MouseWheel
 		};
 	public:
-		Event(Type type, WPARAM wParam, LPARAM lParam);
-		Type getType();
-		POINTS GetPos();
-		WPARAM getWParam();
+		Event(Type type, std::pair<float, float> position);
+		Type GetType();
+		std::pair<float, float> GetPos();
 	private:
 		Type type;
-		POINTS mousePosition;
-		WPARAM wParam;
+		std::pair<float, float> position;
 	};
 public:
 	Mouse();
 	void OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam);
 	void OnRawEvent(tagRAWMOUSE rawMouse);
-	POINTS GetPos();
-	POINTS GetPosDelta();
+	std::pair<float, float> GetPos();
+	std::pair<float, float> GetPosDelta();
 	int GetWheelDelta();
 	bool LButtonPressed();
 	bool MButtonPressed();
@@ -46,8 +44,8 @@ public:
 	void SetCenter(POINTS c);
 private:
 	std::optional<Mouse::Event> GetEvent();
-	POINTS position;
-	POINTS positionDelta;
+	std::pair<float, float> position;
+	std::pair<float, float> positionDelta;
 	bool constrained = false;
 	bool rawInput = false;
 	int wheelDelta;

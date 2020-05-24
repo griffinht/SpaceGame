@@ -98,7 +98,7 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString(std::to_string(1000 / dt).c_str());
 	OutputDebugString("\n");
 	*/
-	POINTS pt = window->mouse.GetPosDelta();
+	std::pair<float, float> pt = window->mouse.GetPosDelta();
 	/*
 	OutputDebugString(std::to_string(pt.x).c_str());
 	OutputDebugString(",");
@@ -109,7 +109,7 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString(std::to_string((float)pt.x / (float)window->Graphics().GetBackBufferWidth()).c_str());
 	OutputDebugString("\n");
 	*/
-	camera.ChangeRotation(((float)pt.y / (float)window->Graphics().GetBackBufferHeight()), ((float)pt.x / (float)window->Graphics().GetBackBufferWidth()), 0);
+	camera.ChangeRotation((pt.second / (float)window->Graphics().GetBackBufferHeight()), (pt.first / (float)window->Graphics().GetBackBufferWidth()), 0);
 	
 	try {
 		window->Graphics().SetProjection(camera.GetViewMatrix() * camera.GetProjectionMatrix());

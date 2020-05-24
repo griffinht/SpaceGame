@@ -2,26 +2,20 @@
 #include <string>
 #include <sstream>
 
-Mouse::Event::Event(Type type, WPARAM wParam, LPARAM lParam)
+Mouse::Event::Event(Type type, std::pair<float, float> position)
 {
 	this->type = type;
-	mousePosition = MAKEPOINTS(lParam);
-	this->wParam = wParam;
+	this->position = position;
 }
 
-Mouse::Event::Type Mouse::Event::getType()
+Mouse::Event::Type Mouse::Event::GetType()
 {
 	return type;
 }
 
-POINTS Mouse::Event::GetPos()
+std::pair<float, float> Mouse::Event::GetPos()
 {
-	return mousePosition;
-}
-
-WPARAM Mouse::Event::getWParam() 
-{
-	return wParam;
+	return position;
 }
 
 std::optional<Mouse::Event> Mouse::GetEvent()
@@ -48,46 +42,52 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 	{
 		switch (type)
 		{
+		case Event::Type::LButtonDown:
+			lButtonPressed = false;
+			events.push(Event::Event(type, position));
+			break;
+		case Event::Type::LButtonUp:
+			lButtonPressed = true;
+			events.push(Event::Event(type, position));
+			break;
+		case Event::Type::MButtonDown:
+			mButtonPressed = true;
+			events.push(Event::Event(type, position));
+			break;
+		case Event::Type::MButtonUp:
+			mButtonPressed = false;
+			events.push(Event::Event(type, position));
+			break;
+		case Event::Type::RButtonDown:
+			SetConstrained(true);
+			rButtonPressed = true;
+			events.push(Event::Event(type, position));
+			break;
+		case Event::Type::RButtonUp:
+			SetConstrained(false);
+			rButtonPressed = false;
+			events.push(Event::Event(type, position));
+			break;
 		case Event::Type::Move:
 			if (constrained)
 			{
 				POINT pt;
 				GetCursorPos(&pt);
-				positionDelta = { positionDelta.x + (short)pt.x - center.x, positionDelta.y + (short)pt.y - center.y };
+				positionDelta = { positionDelta.first + (short)pt.x - center.x, positionDelta.second + (short)pt.y - center.y };
 				SetCursorPos(center.x, center.y);
 			}
 			else
 			{
 				POINTS pt = MAKEPOINTS(lParam);
-				positionDelta = { positionDelta.x + pt.x - position.x, positionDelta.y + pt.y - position.y };
-				position = pt;
+				positionDelta = { positionDelta.first + pt.x - position.first, positionDelta.second + pt.y - position.second };
+				position = { pt.x, pt.y };
 			}
-			break;
-		case Event::Type::LButtonDown:
-			lButtonPressed = false;
-			break;
-		case Event::Type::LButtonUp:
-			lButtonPressed = true;
-			break;
-		case Event::Type::MButtonDown:
-			mButtonPressed = true;
-			break;
-		case Event::Type::MButtonUp:
-			mButtonPressed = false;
-			break;
-		case Event::Type::RButtonDown:
-			SetConstrained(true);
-			rButtonPressed = true;
-			break;
-		case Event::Type::RButtonUp:
-			SetConstrained(false);
-			rButtonPressed = false;
 			break;
 		case Event::Type::MouseWheel:
 			wheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
 			break;
 		}
-		events.push(Mouse::Event::Event(type, wParam, lParam));
+
 		while (maxBufferSize > 0 && events.size() > maxBufferSize)
 		{
 			events.pop();
@@ -99,18 +99,75 @@ void Mouse::OnRawEvent(tagRAWMOUSE rawMouse)
 {
 	if (rawInput)
 	{
+		if (rawMouse.usFlags & MOUSE_MOVE_ABSOLUTE)
+		{
+			bool isVirtualDesktop = (rawMouse.usFlags & MOUSE_VIRTUAL_DESKTOP) == MOUSE_VIRTUAL_DESKTOP;
+			float xChange = (rawMouse.lLastX / 65535.0f) * GetSystemMetrics(isVirtualDesktop ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
+			float yChange = (rawMouse.lLastY / 65535.0f) * GetSystemMetrics(isVirtualDesktop ? SM_CYVIRTUALSCREEN : SM_CYSCREEN);
 
+			positionDelta = { positionDelta.first + rawMouse.lLastX - position.first, positionDelta.second + rawMouse.lLastY - position.second };
+
+			position.first += xChange;
+			position.second += yChange;
+		}
+		else
+		{
+			positionDelta = { positionDelta.first + rawMouse.lLastX, positionDelta.second + rawMouse.lLastY };
+
+			position.first += rawMouse.lLastX;
+			position.second += rawMouse.lLastY;
+		}
+
+		if (rawMouse.ulButtons & RI_MOUSE_LEFT_BUTTON_DOWN)
+			lButtonPressed = true;
+		if (rawMouse.ulButtons & RI_MOUSE_LEFT_BUTTON_UP)
+			lButtonPressed = false;
+		if (rawMouse.ulButtons & RI_MOUSE_MIDDLE_BUTTON_DOWN)
+			mButtonPressed = true;
+		if (rawMouse.ulButtons & RI_MOUSE_MIDDLE_BUTTON_UP)
+			mButtonPressed = false;
+		if (rawMouse.ulButtons & RI_MOUSE_RIGHT_BUTTON_DOWN)
+		{
+			SetConstrained(true);
+			rButtonPressed = true;
+		}
+		if (rawMouse.ulButtons & RI_MOUSE_RIGHT_BUTTON_UP)
+		{ 
+			SetConstrained(false);
+			rButtonPressed = true; 
+		}
+		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_4_DOWN)
+		{
+
+		}
+		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_4_UP)
+		{
+
+		}
+		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_5_DOWN)
+		{
+
+		}
+		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_5_UP)
+		{
+
+		}
+
+		if (rawMouse.usButtonFlags & RI_MOUSE_WHEEL)
+		{
+			wheelDelta += rawMouse.usButtonData;
+		}
 	}
 }
 
-POINTS Mouse::GetPos()
+std::pair<float, float> Mouse::GetPos()
 {
 	return position;
 }
 
-POINTS Mouse::GetPosDelta()
+std::pair<float, float> Mouse::GetPosDelta()
 {
-	POINTS d = positionDelta;
+	std::pair<float, float> d = positionDelta;
 	positionDelta = { 0, 0 };
 	return d;
 }
