@@ -41,7 +41,7 @@ public:
 	bool RButtonPressed();
 	bool Constrained();
 	void Constrain(bool constrain);
-	void SetSize(int width, int height);
+	void SetCenter(POINTS c);
 private:
 	std::optional<Mouse::Event> GetEvent();
 	POINTS position;

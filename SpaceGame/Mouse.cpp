@@ -42,15 +42,19 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 	switch (type)
 	{
 	case Event::Type::Move:
-		POINTS pt = MAKEPOINTS(lParam);
-		positionDelta = { positionDelta.x + pt.x - position.x, positionDelta.y + pt.y - position.y };
-
 		if (constrained)
 		{
+			POINT pt;
+			GetCursorPos(&pt);
+			positionDelta = { positionDelta.x + (short) pt.x - center.x, positionDelta.y + (short) pt.y - center.y };
 			SetCursorPos(center.x, center.y);
 		}
-
-		position = pt;
+		else
+		{
+			POINTS pt = MAKEPOINTS(lParam);
+			positionDelta = { positionDelta.x + pt.x - position.x, positionDelta.y + pt.y - position.y };
+			position = pt;
+		}
 		break;
 	case Event::Type::LButtonDown:
 		lButtonPressed = false;
@@ -127,7 +131,7 @@ void Mouse::Constrain(bool constrain)
 	constrained = constrain;
 }
 
-void Mouse::SetSize(int width, int height)
+void Mouse::SetCenter(POINTS c)
 {
-	center = POINTS({(short) (width / 2), (short) (height / 2) });
+	center = c;
 }

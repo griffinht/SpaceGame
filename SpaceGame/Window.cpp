@@ -173,11 +173,12 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_MOUSEWHEEL:
 		mouse.OnEvent(Mouse::Event::Type::MouseWheel, wParam, lParam);
 	case WM_SIZE:
+		POINTS pt = MAKEPOINTS(lParam);
 		if (pGraphics)
 		{
-			Graphics().ResizeBuffers(LOWORD(lParam), HIWORD(lParam));
-			mouse.SetSize(LOWORD(lParam), HIWORD(lParam));
+			Graphics().ResizeBuffers(pt.x, pt.y);
 		}
+		mouse.SetCenter({ (short) (pt.x / 2), (short) (pt.y / 2) });
 		break;
 	case WM_ACTIVATE:
 		if (targetWindowState & FULLSCREEN)
