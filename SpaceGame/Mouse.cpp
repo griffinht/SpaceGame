@@ -69,11 +69,11 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 		mButtonPressed = false;
 		break;
 	case Event::Type::RButtonDown:
-		constrained = true;
+		Constrain(true);
 		rButtonPressed = true;
 		break;
 	case Event::Type::RButtonUp:
-		constrained = false;
+		Constrain(false);
 		rButtonPressed = false;
 		break;
 	case Event::Type::MouseWheel:
@@ -129,6 +129,7 @@ bool Mouse::Constrained()
 void Mouse::Constrain(bool constrain)
 {
 	constrained = constrain;
+	ShowCursor(!constrain);
 }
 
 void Mouse::SetCenter(POINTS c)
