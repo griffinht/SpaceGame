@@ -38,59 +38,73 @@ Mouse::Mouse()
 
 void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 {
-	if (!rawInput)
+	switch (type)
 	{
-		switch (type)
-		{
-		case Event::Type::LButtonDown:
-			lButtonPressed = false;
-			events.push(Event::Event(type, position));
-			break;
-		case Event::Type::LButtonUp:
-			lButtonPressed = true;
-			events.push(Event::Event(type, position));
-			break;
-		case Event::Type::MButtonDown:
-			mButtonPressed = true;
-			events.push(Event::Event(type, position));
-			break;
-		case Event::Type::MButtonUp:
-			mButtonPressed = false;
-			events.push(Event::Event(type, position));
-			break;
-		case Event::Type::RButtonDown:
-			SetConstrained(true);
-			rButtonPressed = true;
-			events.push(Event::Event(type, position));
-			break;
-		case Event::Type::RButtonUp:
-			SetConstrained(false);
-			rButtonPressed = false;
-			events.push(Event::Event(type, position));
-			break;
-		case Event::Type::Move:
-			if (constrained)
-			{
-				POINT pt;
-				GetCursorPos(&pt);
-				positionDelta = { positionDelta.first + (short)pt.x - center.x, positionDelta.second + (short)pt.y - center.y };
-				SetCursorPos(center.x, center.y);
-			}
-			else
-			{
-				POINTS pt = MAKEPOINTS(lParam);
-				positionDelta = { positionDelta.first + pt.x - position.first, positionDelta.second + pt.y - position.second };
-				position = { pt.x, pt.y };
-			}
-			break;
-		case Event::Type::MouseWheel:
-			wheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
-			break;
-		}
+	case Event::Type::LButtonDown:
+		lButtonPressed = false;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::LButtonUp:
+		lButtonPressed = true;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::MButtonDown:
+		mButtonPressed = true;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::MButtonUp:
+		mButtonPressed = false;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::RButtonDown:
+		SetConstrained(true);
+		rButtonPressed = true;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::RButtonUp:
+		SetConstrained(false);
+		rButtonPressed = false;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::XButton1Down:
+		xButton1Pressed = true;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::XButton1Up:
+		xButton1Pressed = true;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::XButton2Down:
+		xButton2Pressed = true;
+		events.push(Event::Event(type, position));
+		break;
+	case Event::Type::XButton2Up:
+		xButton2Pressed = false;
+		break;
+	case Event::Type::MouseWheel:
+		wheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
+		break;
+	}
 
-		while (maxBufferSize > 0 && events.size() > maxBufferSize)
+	while (maxBufferSize > 0 && events.size() > maxBufferSize)
+	{
+		events.pop();
+	}
+
+	if (!rawInput && type == Event::Type::Move)
+	{
+		if (constrained)
 		{
-			events.pop();
+			POINT pt;
+			GetCursorPos(&pt);
+			positionDelta = { positionDelta.first + (short)pt.x - center.x, positionDelta.second + (short)pt.y - center.y };
+			SetCursorPos(center.x, center.y);
+		}
+		else
+		{
+			POINTS pt = MAKEPOINTS(lParam);
+			positionDelta = { positionDelta.first + pt.x - position.first, positionDelta.second + pt.y - position.second };
+			position = { pt.x, pt.y };
 		}
 	}
 }
@@ -116,46 +130,6 @@ void Mouse::OnRawEvent(tagRAWMOUSE rawMouse)
 
 			position.first += rawMouse.lLastX;
 			position.second += rawMouse.lLastY;
-		}
-
-		if (rawMouse.ulButtons & RI_MOUSE_LEFT_BUTTON_DOWN)
-			lButtonPressed = true;
-		if (rawMouse.ulButtons & RI_MOUSE_LEFT_BUTTON_UP)
-			lButtonPressed = false;
-		if (rawMouse.ulButtons & RI_MOUSE_MIDDLE_BUTTON_DOWN)
-			mButtonPressed = true;
-		if (rawMouse.ulButtons & RI_MOUSE_MIDDLE_BUTTON_UP)
-			mButtonPressed = false;
-		if (rawMouse.ulButtons & RI_MOUSE_RIGHT_BUTTON_DOWN)
-		{
-			SetConstrained(true);
-			rButtonPressed = true;
-		}
-		if (rawMouse.ulButtons & RI_MOUSE_RIGHT_BUTTON_UP)
-		{ 
-			SetConstrained(false);
-			rButtonPressed = true; 
-		}
-		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_4_DOWN)
-		{
-
-		}
-		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_4_UP)
-		{
-
-		}
-		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_5_DOWN)
-		{
-
-		}
-		if (rawMouse.ulButtons & RI_MOUSE_BUTTON_5_UP)
-		{
-
-		}
-
-		if (rawMouse.usButtonFlags & RI_MOUSE_WHEEL)
-		{
-			wheelDelta += rawMouse.usButtonData;
 		}
 	}
 }
@@ -192,6 +166,16 @@ bool Mouse::MButtonPressed()
 bool Mouse::RButtonPressed()
 {
 	return rButtonPressed;
+}
+
+bool Mouse::XButton1Pressed()
+{
+	return xButton1Pressed;
+}
+
+bool Mouse::XButton2Pressed()
+{
+	return xButton2Pressed;
 }
 
 void Mouse::SetRawInput(bool rawInput)

@@ -19,6 +19,10 @@ public:
 			MButtonUp,
 			RButtonDown,
 			RButtonUp,
+			XButton1Down,
+			XButton1Up,
+			XButton2Down,
+			XButton2Up,
 			MouseWheel
 		};
 	public:
@@ -39,6 +43,8 @@ public:
 	bool LButtonPressed();
 	bool MButtonPressed();
 	bool RButtonPressed();
+	bool XButton1Pressed();
+	bool XButton2Pressed();
 	void SetRawInput(bool rawInput);
 	void SetConstrained(bool constrain);
 	void SetCenter(POINTS c);
@@ -52,6 +58,8 @@ private:
 	bool lButtonPressed;
 	bool mButtonPressed;
 	bool rButtonPressed;
+	bool xButton1Pressed;
+	bool xButton2Pressed;
 	std::queue<Mouse::Event> events;
 	const int maxBufferSize = -1;
 	POINTS center;
