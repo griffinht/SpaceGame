@@ -61,6 +61,6 @@ private:
 	bool xButton1Pressed;
 	bool xButton2Pressed;
 	std::queue<Mouse::Event> events;
-	const int maxBufferSize = -1;
+	const int maxBufferSize = 64;
 	POINTS center;
 };

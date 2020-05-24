@@ -38,4 +38,8 @@ std::optional<Keyboard::Event> Keyboard::GetEvent()
 void Keyboard::OnEvent(Keyboard::Event::Type type, WPARAM wParam, LPARAM lParam)
 {
 	events.push(Keyboard::Event::Event(type, wParam, lParam));
+	while (maxBufferSize > 0 && events.size() > maxBufferSize)
+	{
+		events.pop();
+	}
 }

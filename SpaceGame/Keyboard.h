@@ -32,4 +32,5 @@ public:
 	void OnEvent(Keyboard::Event::Type type, WPARAM wParam, LPARAM lParam);
 private:
 	std::queue<Keyboard::Event> events;
+	const int maxBufferSize = 64;
 };
