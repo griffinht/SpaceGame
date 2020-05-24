@@ -39,6 +39,43 @@ std::optional<Mouse::Event> Mouse::GetEvent()
 
 void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 {
+	switch (type)
+	{
+	case Event::Type::Move:
+		POINTS pt = MAKEPOINTS(lParam);
+		positionDelta = { positionDelta.x + pt.x - position.x, positionDelta.y + pt.y - position.y };
+
+		if (constrained)
+		{
+			SetCursorPos(center.x, center.y);
+		}
+
+		position = pt;
+		break;
+	case Event::Type::LButtonDown:
+		lButtonPressed = false;
+		break;
+	case Event::Type::LButtonUp:
+		lButtonPressed = true;
+		break;
+	case Event::Type::MButtonDown:
+		mButtonPressed = true;
+		break;
+	case Event::Type::MButtonUp:
+		mButtonPressed = false;
+		break;
+	case Event::Type::RButtonDown:
+		constrained = true;
+		rButtonPressed = true;
+		break;
+	case Event::Type::RButtonUp:
+		constrained = false;
+		rButtonPressed = false;
+		break;
+	case Event::Type::MouseWheel:
+		wheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
+		break;
+	}
 	events.push(Mouse::Event::Event(type, wParam, lParam));
 	while (maxBufferSize > 0 && events.size() > maxBufferSize)
 	{
@@ -48,40 +85,21 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 
 POINTS Mouse::GetPos()
 {
-	return mousePosition;
-}
-
-void Mouse::SetPos(POINTS pt)
-{
-	mousePositionDelta = { mousePositionDelta.x + pt.x - mousePosition.x, mousePositionDelta.y + pt.y - mousePosition.y };
-	if (constrained)
-	{
-		SetCursorPos(0, 0);
-		mousePosition = pt;
-	}
-	else
-	{
-		mousePosition = pt;
-	}
+	return position;
 }
 
 POINTS Mouse::GetPosDelta()
 {
-	POINTS d = mousePositionDelta;
-	mousePositionDelta = { 0, 0 };
+	POINTS d = positionDelta;
+	positionDelta = { 0, 0 };
 	return d;
 }
 
 int Mouse::GetWheelDelta()
 {
-	int d = mouseWheelDelta;
-	mouseWheelDelta = 0;
+	int d = wheelDelta;
+	wheelDelta = 0;
 	return d;
-}
-
-void Mouse::SetWheelDelta(int delta)
-{
-	mouseWheelDelta += delta;
 }
 
 bool Mouse::LButtonPressed()
@@ -89,19 +107,9 @@ bool Mouse::LButtonPressed()
 	return lButtonPressed;
 }
 
-void Mouse::SetLButtonPressed(bool pressed)
-{
-	lButtonPressed = pressed;
-}
-
 bool Mouse::MButtonPressed()
 {
 	return mButtonPressed;
-}
-
-void Mouse::SetMButtonPressed(bool pressed)
-{
-	mButtonPressed = true;
 }
 
 bool Mouse::RButtonPressed()
@@ -109,18 +117,17 @@ bool Mouse::RButtonPressed()
 	return rButtonPressed;
 }
 
-void Mouse::SetRButtonPressed(bool pressed)
-{
-	rButtonPressed = true;
-}
-
-void Mouse::SetConstrained(bool constrained)
-{
-	this->constrained = constrained;
-	ShowCursor(!constrained);
-}
-
 bool Mouse::Constrained()
 {
 	return constrained;
+}
+
+void Mouse::Constrain(bool constrain)
+{
+	constrained = constrain;
+}
+
+void Mouse::SetSize(int width, int height)
+{
+	center = POINTS({(short) (width / 2), (short) (height / 2) });
 }

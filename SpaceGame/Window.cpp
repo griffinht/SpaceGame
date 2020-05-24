@@ -150,40 +150,33 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		keyboard.OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
 		break;
 	case WM_MOUSEMOVE:
-		mouse.SetPos(MAKEPOINTS(wParam));
 		mouse.OnEvent(Mouse::Event::Type::Move, wParam, lParam);
 		break;
 	case WM_LBUTTONDOWN:
-		mouse.SetLButtonPressed(true);
 		mouse.OnEvent(Mouse::Event::Type::LButtonDown, wParam, lParam);
 		break;
 	case WM_LBUTTONUP:
-		mouse.SetLButtonPressed(false);
 		mouse.OnEvent(Mouse::Event::Type::LButtonUp, wParam, lParam);
 		break;
 	case WM_MBUTTONDOWN:
-		mouse.SetMButtonPressed(true);
 		mouse.OnEvent(Mouse::Event::Type::MButtonDown, wParam, lParam);
 		break;
 	case WM_MBUTTONUP:
-		mouse.SetMButtonPressed(false);
 		mouse.OnEvent(Mouse::Event::Type::MButtonUp, wParam, lParam);
 		break;
 	case WM_RBUTTONDOWN:
-		mouse.SetRButtonPressed(true);
 		mouse.OnEvent(Mouse::Event::Type::RButtonDown, wParam, lParam);
 		break;
 	case WM_RBUTTONUP:
-		mouse.SetRButtonPressed(false);
 		mouse.OnEvent(Mouse::Event::Type::RButtonUp, wParam, lParam);
 		break;
 	case WM_MOUSEWHEEL:
-		mouse.SetWheelDelta(GET_WHEEL_DELTA_WPARAM(wParam));
 		mouse.OnEvent(Mouse::Event::Type::MouseWheel, wParam, lParam);
 	case WM_SIZE:
 		if (pGraphics)
 		{
 			Graphics().ResizeBuffers(LOWORD(lParam), HIWORD(lParam));
+			mouse.SetSize(LOWORD(lParam), HIWORD(lParam));
 		}
 		break;
 	case WM_ACTIVATE:

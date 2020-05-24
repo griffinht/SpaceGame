@@ -34,27 +34,24 @@ public:
 public:
 	void OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam);
 	POINTS GetPos();
-	void SetPos(POINTS pt);
 	POINTS GetPosDelta();
 	int GetWheelDelta();
-	void SetWheelDelta(int delta);
 	bool LButtonPressed();
-	void SetLButtonPressed(bool pressed);
 	bool MButtonPressed();
-	void SetMButtonPressed(bool pressed);
 	bool RButtonPressed();
-	void SetRButtonPressed(bool pressed);
 	bool Constrained();
-	void SetConstrained(bool constrained);
+	void Constrain(bool constrain);
+	void SetSize(int width, int height);
 private:
 	std::optional<Mouse::Event> GetEvent();
-	POINTS mousePosition;
-	POINTS mousePositionDelta;
+	POINTS position;
+	POINTS positionDelta;
 	bool constrained = false;
-	int mouseWheelDelta;
+	int wheelDelta;
 	bool lButtonPressed;
 	bool mButtonPressed;
 	bool rButtonPressed;
 	std::queue<Mouse::Event> events;
 	const int maxBufferSize = -1;
+	POINTS center;
 };
