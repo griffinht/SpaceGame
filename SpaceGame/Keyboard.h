@@ -27,10 +27,11 @@ public:
 		LPARAM lParam;
 	};
 public:
-	Keyboard() = default;
+	bool KeyPressed(unsigned char key);
 	std::optional<Keyboard::Event> GetEvent();
 	void OnEvent(Keyboard::Event::Type type, WPARAM wParam, LPARAM lParam);
 private:
 	std::queue<Keyboard::Event> events;
+	bool keysPressed[256] = { false };
 	const int maxBufferSize = 64;
 };

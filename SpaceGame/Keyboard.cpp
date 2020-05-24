@@ -22,6 +22,11 @@ LPARAM Keyboard::Event::GetLParam()
 	return lParam;
 }
 
+bool Keyboard::KeyPressed(unsigned char key)
+{
+	return keysPressed[key];
+}
+
 std::optional<Keyboard::Event> Keyboard::GetEvent()
 {
 	if (events.empty())
@@ -37,7 +42,21 @@ std::optional<Keyboard::Event> Keyboard::GetEvent()
 
 void Keyboard::OnEvent(Keyboard::Event::Type type, WPARAM wParam, LPARAM lParam)
 {
+	switch (type)
+	{
+	case Event::Type::Keydown:
+		keysPressed[wParam] = true;
+		break;
+	case Event::Type::Keyup:
+		keysPressed[wParam] = false;
+		break;
+	case Event::Type::Char:
+		//todo
+		break;
+	}
+
 	events.push(Keyboard::Event::Event(type, wParam, lParam));
+
 	while (maxBufferSize > 0 && events.size() > maxBufferSize)
 	{
 		events.pop();
