@@ -69,11 +69,11 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 		mButtonPressed = false;
 		break;
 	case Event::Type::RButtonDown:
-		Constrain(true);
+		SetConstrained(true);
 		rButtonPressed = true;
 		break;
 	case Event::Type::RButtonUp:
-		Constrain(false);
+		SetConstrained(false);
 		rButtonPressed = false;
 		break;
 	case Event::Type::MouseWheel:
@@ -121,12 +121,12 @@ bool Mouse::RButtonPressed()
 	return rButtonPressed;
 }
 
-bool Mouse::Constrained()
+void Mouse::SetRawInput(bool rawInput)
 {
-	return constrained;
+	this->rawInput = rawInput;
 }
 
-void Mouse::Constrain(bool constrain)
+void Mouse::SetConstrained(bool constrain)
 {
 	constrained = constrain;
 	ShowCursor(!constrain);

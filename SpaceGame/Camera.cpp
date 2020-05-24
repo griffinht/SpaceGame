@@ -34,12 +34,6 @@ void Camera::ChangePosition(float x, float y, float z)
 
 void Camera::ChangeRotation(float pitch, float yaw, float roll)//should be between -1 and 1, will be converted to radians
 {
-	OutputDebugString(std::to_string(rotation.x).c_str());
-	OutputDebugString(", ");
-	OutputDebugString(std::to_string(rotation.y).c_str());
-	OutputDebugString(", ");
-	OutputDebugString(std::to_string(rotation.z).c_str());
-	OutputDebugString("\n");
 	rotation.x += (pitch * M_PI * 2);
 	rotation.x = NormalizeInRange(rotation.x, -M_PI_2 + 0.0001f, M_PI_2 - 0.0001f);
 	rotation.y = fmod(rotation.y + (yaw * M_PI * 2), M_PI * 2);//todo this is between -6.28 and 6.28 should be 0 to 3.14

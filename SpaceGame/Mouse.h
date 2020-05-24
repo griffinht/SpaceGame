@@ -39,14 +39,15 @@ public:
 	bool LButtonPressed();
 	bool MButtonPressed();
 	bool RButtonPressed();
-	bool Constrained();
-	void Constrain(bool constrain);
+	void SetRawInput(bool rawInput);
+	void SetConstrained(bool constrain);
 	void SetCenter(POINTS c);
 private:
 	std::optional<Mouse::Event> GetEvent();
 	POINTS position;
 	POINTS positionDelta;
 	bool constrained = false;
+	bool rawInput = true;
 	int wheelDelta;
 	bool lButtonPressed;
 	bool mButtonPressed;
