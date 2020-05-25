@@ -109,7 +109,13 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString(std::to_string((float)pt.x / (float)window->Graphics().GetBackBufferWidth()).c_str());
 	OutputDebugString("\n");
 	*/
-	camera.ChangeRotation((pt.second / (float)window->Graphics().GetBackBufferHeight()), (pt.first / (float)window->Graphics().GetBackBufferWidth()), 0);
+	DirectX::XMFLOAT3 rotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth(), 0 };
+	if (window->keyboard.KeyPressed(0x45))
+		rotation.z -= dt * 0.001f;
+	if (window->keyboard.KeyPressed(0x51))
+		rotation.z += dt * 0.001f;//todo regular units
+	camera.Rotate(rotation);
+
 	DirectX::XMFLOAT3 translation{};
 
 	if (window->keyboard.KeyPressed(0x44))//d
