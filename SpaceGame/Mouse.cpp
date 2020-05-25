@@ -206,11 +206,25 @@ void Mouse::SetConstrained(bool constrain)
 {
 	constrained = constrain;
 	SetCursorVisibility(!constrain);
+	if (!constrain)
+	{
+		SetCursorPos(center.x, center.y);
+	}
+	if (constrained)
+	{
+		const RECT c = { 0, 0, size.x, size.y };
+		ClipCursor(&c);
+	}
+	else
+	{
+		ClipCursor(nullptr);
+	}
 }
 
-void Mouse::SetCenter(POINTS c)
+void Mouse::SetSize(POINTS c)
 {
-	center = c;
+	size = c;
+	center = { (short)(c.x / 2), (short)(c.y / 2) };
 }
 
 void Mouse::SetCursorVisibility(bool show)

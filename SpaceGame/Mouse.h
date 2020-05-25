@@ -47,7 +47,7 @@ public:
 	bool XButton2Pressed();
 	void SetRawInput(bool rawInput);
 	void SetConstrained(bool constrain);
-	void SetCenter(POINTS c);
+	void SetSize(POINTS c);
 private:
 	void SetCursorVisibility(bool show);
 private:
@@ -64,5 +64,6 @@ private:
 	bool xButton2Pressed;
 	std::queue<Mouse::Event> events;
 	const int maxBufferSize = 64;
+	POINTS size;
 	POINTS center;
 };
