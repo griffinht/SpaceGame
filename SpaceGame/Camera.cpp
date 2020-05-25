@@ -25,11 +25,23 @@ void Camera::SetZoom(float zoom)
 	this->zoom = zoom;
 }
 
-void Camera::ChangePosition(float x, float y, float z)
+void Camera::Translate(DirectX::XMFLOAT3 translation)
 {
-	position.x += x;
-	position.y += y;
-	position.z += z;
+	position.x += translation.x;
+	position.y += translation.y;
+	position.z += translation.z;
+}
+
+void Camera::TranslateWithRotation(DirectX::XMFLOAT3 translation)
+{
+	DirectX::XMStoreFloat3(&translation, DirectX::XMVector3Transform(
+		DirectX::XMLoadFloat3(&translation),
+		DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z)
+	));
+
+	position.x += translation.x;
+	position.y += translation.y;
+	position.z += translation.z;
 }
 
 void Camera::ChangeRotation(float pitch, float yaw, float roll)//should be between -1 and 1, will be converted to radians

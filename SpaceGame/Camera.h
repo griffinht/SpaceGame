@@ -13,7 +13,8 @@ public:
 	void SetProjectionRect(DirectX::XMFLOAT4 rect);
 	void SetZoom(float zoom);
 
-	void ChangePosition(float x, float y, float z);
+	void Translate(DirectX::XMFLOAT3 translation);
+	void TranslateWithRotation(DirectX::XMFLOAT3 translation);
 	void ChangeRotation(float pitch, float yaw, float roll);
 	void ChangeZoom(float zoom);
 
