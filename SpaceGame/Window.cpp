@@ -181,7 +181,7 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		{
 			Graphics().ResizeBuffers(pt.x, pt.y);
 		}
-		mouse.SetCenter({ (short) (pt.x / 2), (short) (pt.y / 2) });
+		mouse.SetSize(pt);
 		break;
 	case WM_ACTIVATE:
 		if (targetWindowState & FULLSCREEN)
