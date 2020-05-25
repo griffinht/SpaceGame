@@ -49,6 +49,8 @@ public:
 	void SetConstrained(bool constrain);
 	void SetCenter(POINTS c);
 private:
+	void SetCursorVisibility(bool show);
+private:
 	std::optional<Mouse::Event> GetEvent();
 	std::pair<float, float> position;
 	std::pair<float, float> positionDelta;

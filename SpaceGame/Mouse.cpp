@@ -205,10 +205,22 @@ void Mouse::SetRawInput(bool rawInput)
 void Mouse::SetConstrained(bool constrain)
 {
 	constrained = constrain;
-	ShowCursor(!constrain);
+	SetCursorVisibility(!constrain);
 }
 
 void Mouse::SetCenter(POINTS c)
 {
 	center = c;
+}
+
+void Mouse::SetCursorVisibility(bool show)
+{
+	if (show)
+	{
+		while (ShowCursor(show));
+	}
+	else
+	{
+		while (!ShowCursor(show));
+	}
 }
