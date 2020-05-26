@@ -124,7 +124,7 @@ void Engine::Render(float tick, float dt)
 		translation.x -= dt;
 	if (window->keyboard.KeyPressed(VK_SPACE))
 		translation.y += dt;
-	if (window->keyboard.KeyPressed(VK_CONTROL))
+	if (window->keyboard.KeyPressed(0x43))//c
 		translation.y -= dt;
 	if (window->keyboard.KeyPressed(0x57))//w
 		translation.z += dt;
