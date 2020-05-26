@@ -111,9 +111,9 @@ void Engine::Render(float tick, float dt)
 	*/
 	float fov = 0.0f;
 	if (window->mouse.XButton1Pressed())
-		fov += 0.1f;
+		fov += 0.01f;
 	if (window->mouse.XButton2Pressed())
-		fov -= 0.1f;
+		fov -= 0.01f;
 	camera.ChangeFOV(fov);
 
 	std::pair<float, float> pt = window->mouse.GetPosDelta();
