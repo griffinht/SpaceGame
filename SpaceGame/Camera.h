@@ -25,6 +25,6 @@ private:
 	DirectX::XMMATRIX rotationMatrixX = DirectX::XMMatrixRotationX(0.0f);
 	DirectX::XMMATRIX rotationMatrixY = DirectX::XMMatrixRotationY(0.0f);
 	DirectX::XMMATRIX rotationMatrixZ = DirectX::XMMatrixRotationZ(0.0f);
-	float fov = 90.0f;
+	float fov = 1.0f;
 	float aspectRatio = 16.0f / 9.0f;
 };

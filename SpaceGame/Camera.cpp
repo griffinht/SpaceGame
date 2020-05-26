@@ -30,6 +30,7 @@ void Camera::SetFOV(float fov)
 void Camera::ChangeFOV(float fov)
 {
 	this->fov += fov;
+	this->fov = min(max(this->fov, 0.001f), M_PI);
 }
 
 void Camera::Translate(DirectX::XMFLOAT3 translation)
