@@ -26,8 +26,6 @@ private:
 	DirectX::XMMATRIX rotationMatrixX = DirectX::XMMatrixRotationX(0.0f);
 	DirectX::XMMATRIX rotationMatrixY = DirectX::XMMatrixRotationY(0.0f);
 	DirectX::XMMATRIX rotationMatrixZ = DirectX::XMMatrixRotationZ(0.0f);
-	DirectX::XMMATRIX rotationMatrixZReal = DirectX::XMMatrixRotationZ(0.0f);
-	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0, 0, 0);
 	DirectX::XMFLOAT4 projectionRect = DirectX::XMFLOAT4(-640.0f, 640.0f, -310.0f, 310.0f);
 	float zoom = 1.0f;
 };
