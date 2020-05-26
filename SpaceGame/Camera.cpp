@@ -5,6 +5,11 @@
 Camera::Camera()
 {}
 
+void Camera::SetAspectRatio(float aspectRatio)
+{
+	this->aspectRatio = aspectRatio;
+}
+
 void Camera::SetPosition(float x, float y, float z)
 {
 	position = DirectX::XMFLOAT3(x, y, z);
@@ -12,17 +17,19 @@ void Camera::SetPosition(float x, float y, float z)
 
 void Camera::SetRotation(float pitch, float yaw, float roll)
 {
-	rotation = DirectX::XMFLOAT3(pitch, yaw, roll);
+	rotationMatrixX = DirectX::XMMatrixRotationX(pitch);
+	rotationMatrixY = DirectX::XMMatrixRotationX(yaw);
+	rotationMatrixZ = DirectX::XMMatrixRotationX(roll);
 }
 
-void Camera::SetProjectionRect(DirectX::XMFLOAT4 rect)
+void Camera::SetFOV(float fov)
 {
-	projectionRect = rect;
+	this->fov = fov;
 }
 
-void Camera::SetZoom(float zoom)
+void Camera::ChangeFOV(float fov)
 {
-	this->zoom = zoom;
+	this->fov += fov;
 }
 
 void Camera::Translate(DirectX::XMFLOAT3 translation)
@@ -62,11 +69,6 @@ void Camera::Rotate(DirectX::XMFLOAT3 rot)//yaw pitch roll, should be between -1
 	rotationMatrixZ *= XMMatrixRotationZ(rot.z * M_PI * 2);
 }
 
-void Camera::ChangeZoom(float zoom)
-{
-	this->zoom += zoom;
-}
-
 DirectX::XMMATRIX Camera::GetViewMatrix()
 {
 	using namespace DirectX;
@@ -87,7 +89,7 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix()
 {
 	using namespace DirectX;
 
-	return XMMatrixPerspectiveLH(16, 9, 3, 100);
+	return XMMatrixPerspectiveFovLH(fov, aspectRatio, 1, 100);
 	//XMMatrixPerspectiveFovLH
 	/*
 	return XMMatrixOrthographicOffCenterLH(
@@ -98,9 +100,4 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix()
 		0.1f,
 		10.0f);
 		*/
-}
-
-float Camera::NormalizeInRange(float norm, float min, float max)
-{
-	return min(max(norm, min), max);
 }

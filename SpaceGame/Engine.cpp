@@ -98,7 +98,7 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString(std::to_string(1000 / dt).c_str());
 	OutputDebugString("\n");
 	*/
-	std::pair<float, float> pt = window->mouse.GetPosDelta();
+	
 	/*
 	OutputDebugString(std::to_string(pt.x).c_str());
 	OutputDebugString(",");
@@ -109,6 +109,14 @@ void Engine::Render(float tick, float dt)
 	OutputDebugString(std::to_string((float)pt.x / (float)window->Graphics().GetBackBufferWidth()).c_str());
 	OutputDebugString("\n");
 	*/
+	float fov = 0.0f;
+	if (window->mouse.XButton1Pressed())
+		fov += 0.1f;
+	if (window->mouse.XButton2Pressed())
+		fov -= 0.1f;
+	camera.ChangeFOV(fov);
+
+	std::pair<float, float> pt = window->mouse.GetPosDelta();
 	DirectX::XMFLOAT3 rotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth(), 0 };
 	if (window->keyboard.KeyPressed(0x45))
 		rotation.z -= dt * 0.001f;
@@ -161,5 +169,5 @@ void Engine::Render(float tick, float dt)
 
 void Engine::Resize(int width, int height)
 {
-	camera.SetProjectionRect(DirectX::XMFLOAT4(-(width / 2.0f), width / 2.0f, -(height / 2.0f), height / 2.0f));
+	camera.SetAspectRatio((float)width / (float)height);
 }
