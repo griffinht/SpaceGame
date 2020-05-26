@@ -172,6 +172,26 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_RBUTTONUP:
 		mouse.OnEvent(Mouse::Event::Type::RButtonUp, wParam, lParam);
 		break;
+	case WM_XBUTTONDOWN:
+		if (GET_XBUTTON_WPARAM(wParam) == XBUTTON1)
+		{
+			mouse.OnEvent(Mouse::Event::Type::XButton1Down, wParam, lParam);
+		}
+		else if(GET_XBUTTON_WPARAM(wParam) == XBUTTON2)
+		{
+			mouse.OnEvent(Mouse::Event::Type::XButton2Down, wParam, lParam);
+		}
+		break;
+	case WM_XBUTTONUP:
+		if (GET_XBUTTON_WPARAM(wParam) == XBUTTON1)
+		{
+			mouse.OnEvent(Mouse::Event::Type::XButton1Up, wParam, lParam);
+		}
+		else if (GET_XBUTTON_WPARAM(wParam) == XBUTTON2)
+		{
+			mouse.OnEvent(Mouse::Event::Type::XButton2Up, wParam, lParam);
+		}
+		break;
 	case WM_MOUSEWHEEL:
 		mouse.OnEvent(Mouse::Event::Type::MouseWheel, wParam, lParam);
 		break;

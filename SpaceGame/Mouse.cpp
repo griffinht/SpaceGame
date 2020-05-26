@@ -71,7 +71,7 @@ void Mouse::OnEvent(Mouse::Event::Type type, WPARAM wParam, LPARAM lParam)
 		events.push(Event::Event(type, position));
 		break;
 	case Event::Type::XButton1Up:
-		xButton1Pressed = true;
+		xButton1Pressed = false;
 		events.push(Event::Event(type, position));
 		break;
 	case Event::Type::XButton2Down:
