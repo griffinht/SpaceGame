@@ -151,6 +151,15 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_CHAR:
 		keyboard.OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
 		break;
+	case WM_SYSKEYDOWN:
+		keyboard.OnEvent(Keyboard::Event::Type::Keydown, wParam, lParam);
+		break;
+	case WM_SYSKEYUP:
+		keyboard.OnEvent(Keyboard::Event::Type::Keyup, wParam, lParam);
+		break;
+	case WM_SYSCHAR:
+		keyboard.OnEvent(Keyboard::Event::Type::Char, wParam, lParam);
+		break;
 	case WM_MOUSEMOVE:
 		mouse.OnEvent(Mouse::Event::Type::Move, wParam, lParam);
 		break;

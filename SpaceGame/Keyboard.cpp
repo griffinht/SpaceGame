@@ -1,4 +1,5 @@
 #include "Keyboard.h"
+#include <string>
 
 Keyboard::Event::Event(Type type, WPARAM key, LPARAM lParam)
 {
