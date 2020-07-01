@@ -30,6 +30,8 @@ void Player::Update(float dt)
 	rotation += rotation * -1 * friction * dt;
 	
 	position += DirectX::XMVector3Transform(movementVelocity, XMMatrixRotationRollPitchYawFromVector(rotation)) * dt;
+
+	position += position * -1 * friction * dt;
 }
 
 DirectX::XMMATRIX Player::GetProjection()
