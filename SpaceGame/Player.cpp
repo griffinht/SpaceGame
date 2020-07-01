@@ -18,6 +18,7 @@ void Player::ChangePlayerRotationVelocity(DirectX::XMVECTOR velocity)
 void Player::ChangePlayerLookPitchYaw(DirectX::XMFLOAT2 pitchYaw)
 {
 	lookPitchYaw.x += pitchYaw.x * M_PI * 2;
+	lookPitchYaw.x = std::min(std::max(lookPitchYaw.x, (float)-M_PI_2 + 0.001f), (float)M_PI_2 - 0.001f);
 	lookPitchYaw.y += pitchYaw.y * M_PI * 2;
 }
 
