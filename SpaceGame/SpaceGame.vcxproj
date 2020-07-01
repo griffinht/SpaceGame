@@ -175,6 +175,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PixelShader.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Topology.cpp" />
     <ClCompile Include="TransformConstantBuffer.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Prism.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="ThreadPool.h" />
@@ -213,6 +215,7 @@
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="Windows.h" />
     <ClInclude Include="WindowThrowMacros.h" />
   </ItemGroup>
   <ItemGroup>

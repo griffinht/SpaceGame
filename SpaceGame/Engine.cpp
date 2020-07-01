@@ -114,15 +114,18 @@ void Engine::Render(float tick, float dt)
 		fov += 0.01f;
 	if (window->mouse.XButton2Pressed())
 		fov -= 0.01f;
-	camera.ChangeFOV(fov);
+	player.GetCamera().ChangeFOV(fov);
 
 	std::pair<float, float> pt = window->mouse.GetPosDelta();
-	DirectX::XMFLOAT3 rotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth(), 0 };
+	DirectX::XMFLOAT2 lookRotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth() };
+	player.ChangePlayerLookPitchYaw(lookRotation);
+
+	DirectX::XMFLOAT3 rotation = { 0, 0, 0 };
 	if (window->keyboard.KeyPressed(0x45))
 		rotation.z -= dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x51))
 		rotation.z += dt * 0.001f;//todo regular units
-	camera.Rotate(rotation);
+	player.ChangePlayerRotationVelocity(rotation);
 
 	DirectX::XMFLOAT3 translation{};
 
@@ -139,10 +142,11 @@ void Engine::Render(float tick, float dt)
 	if (window->keyboard.KeyPressed(0x53))//s
 		translation.z -= dt;
 
-	camera.TranslateWithRotation(translation);
+	player.ChangePlayerMovementVelocity(translation);
 
 	try {
-		window->Graphics().SetProjection(camera.GetViewMatrix() * camera.GetProjectionMatrix());
+		player.Update(dt);
+		window->Graphics().SetProjection(player.GetProjection());
 		window->Graphics().Clear(0.1f, 0.1f, 0.1f);
 		for (auto &d : drawables)
 		{
@@ -169,5 +173,5 @@ void Engine::Render(float tick, float dt)
 
 void Engine::Resize(int width, int height)
 {
-	camera.SetAspectRatio((float)width / (float)height);
+	player.GetCamera().SetAspectRatio((float)width / (float)height);
 }

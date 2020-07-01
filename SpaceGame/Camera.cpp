@@ -1,6 +1,7 @@
 #include "Camera.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <algorithm>
 
 Camera::Camera()
 {}
@@ -30,7 +31,7 @@ void Camera::SetFOV(float fov)
 void Camera::ChangeFOV(float fov)
 {
 	this->fov += fov;
-	this->fov = min(max(this->fov, 0.001f), M_PI);
+	this->fov = std::min(std::max(this->fov, 0.001f), (float) M_PI);
 }
 
 void Camera::Translate(DirectX::XMFLOAT3 translation)
