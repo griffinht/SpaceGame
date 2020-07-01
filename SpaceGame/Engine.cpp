@@ -125,8 +125,8 @@ void Engine::Render(float tick, float dt)
 	}
 	else
 	{
-		rotation.x = lookRotation.x * -1;
-		rotation.y = lookRotation.y * -1;
+		rotation.x = lookRotation.x;
+		rotation.y = lookRotation.y;
 	}
 
 	if (window->keyboard.KeyPressed(0x45))//e
