@@ -133,24 +133,24 @@ void Engine::Render(float tick, float dt)
 		rotation.z += dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x51))//q
 		rotation.z -= dt * 0.001f;//todo regular units
-	player.ChangePlayerRotationVelocity(rotation);
+	player.ChangePlayerRotationVelocity(DirectX::XMLoadFloat3(&rotation));
 
 	DirectX::XMFLOAT3 translation{};
 
 	if (window->keyboard.KeyPressed(0x44))//d
-		translation.x += dt;
+		translation.x += dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x41))//a
-		translation.x -= dt;
+		translation.x -= dt * 0.001f;
 	if (window->keyboard.KeyPressed(VK_SPACE))
-		translation.y += dt;
+		translation.y += dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x43))//c
-		translation.y -= dt;
+		translation.y -= dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x57))//w
-		translation.z += dt;
+		translation.z += dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x53))//s
-		translation.z -= dt;
+		translation.z -= dt * 0.001f;
 
-	player.ChangePlayerMovementVelocity(translation);
+	player.ChangePlayerMovementVelocity(DirectX::XMLoadFloat3(&translation));
 
 	try {
 		player.Update(dt);

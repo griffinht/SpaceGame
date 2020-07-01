@@ -3,18 +3,16 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-void Player::ChangePlayerMovementVelocity(DirectX::XMFLOAT3 velocity)
+void Player::ChangePlayerMovementVelocity(DirectX::XMVECTOR velocity)
 {
 	using namespace DirectX;
-	movementVelocity += XMVector3Transform(XMLoadFloat3(&velocity), XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z));//should player be updated before this???
+	movementVelocity += XMVector3Transform(velocity, XMMatrixRotationRollPitchYawFromVector(rotation));//should player be updated before this???
 }
 
-void Player::ChangePlayerRotationVelocity(DirectX::XMFLOAT3 velocity)
+void Player::ChangePlayerRotationVelocity(DirectX::XMVECTOR velocity)
 {
 	using namespace DirectX;
-	rotationVelocity.x += velocity.x;
-	rotationVelocity.y += velocity.y;
-	rotationVelocity.z += velocity.z;
+	rotationVelocity += velocity;
 }
 
 void Player::ChangePlayerLookPitchYaw(DirectX::XMFLOAT2 pitchYaw)
@@ -27,15 +25,11 @@ void Player::Update(float dt)
 {
 	using namespace DirectX;
 
-	rotation.x += rotationVelocity.x * dt;
-	rotation.y += rotationVelocity.y * dt;
-	rotation.z += rotationVelocity.z * dt;
+	rotation += rotationVelocity * dt;
 
-	rotation.x += rotation.x * -1 * friction * dt;
-	rotation.y += rotation.y * -1 * friction * dt;
-	rotation.z += rotation.z * -1 * friction * dt;
+	rotation += rotation * -1 * friction * dt;
 	
-	position += DirectX::XMVector3Transform(movementVelocity, XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z)) * dt;
+	position += DirectX::XMVector3Transform(movementVelocity, XMMatrixRotationRollPitchYawFromVector(rotation)) * dt;
 }
 
 DirectX::XMMATRIX Player::GetProjection()
@@ -48,7 +42,7 @@ DirectX::XMMATRIX Player::GetProjection()
 			XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
 			XMMatrixRotationRollPitchYaw(lookPitchYaw.x, lookPitchYaw.y, 0.0f)),
 		XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-	return view * XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z) * camera.GetProjectionMatrix();
+	return view * XMMatrixRotationRollPitchYawFromVector(rotation) * camera.GetProjectionMatrix();
 }
 
 Camera Player::GetCamera()
