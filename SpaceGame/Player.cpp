@@ -30,19 +30,24 @@ void Player::Update(float dt)
 
 	rotation += rotation * -1 * friction * dt;
 	
-	position += DirectX::XMVector3Transform(movementVelocity, XMMatrixRotationRollPitchYawFromVector(rotation)) * dt;
+	position += movementVelocity * dt;
+
+	position += position * -1 * friction * dt;
 }
 
 DirectX::XMMATRIX Player::GetProjection()
 {
 	using namespace DirectX;
 
+	XMFLOAT3 vec;
+	XMStoreFloat3(&vec, rotation);
+
 	XMMATRIX view = XMMatrixLookAtLH(
 		position,
-		position + XMVector3Transform(XMVector3Transform(
+		position + XMVector3Transform(
 			XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
-			XMMatrixRotationRollPitchYawFromVector(rotation)), XMMatrixRotationRollPitchYaw(lookPitchYaw.x, lookPitchYaw.y, 0.0f)),
-		XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+			XMMatrixRotationRollPitchYawFromVector(rotation + XMVectorSet(lookPitchYaw.x, lookPitchYaw.y, 0.0f, 0.0f))),
+		XMVector3Transform(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), XMMatrixRotationRollPitchYawFromVector(rotation)));
 	return view * camera.GetProjectionMatrix();
 }
 
