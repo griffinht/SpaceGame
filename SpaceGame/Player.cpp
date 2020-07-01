@@ -30,6 +30,10 @@ void Player::Update(float dt)
 	rotation.x += rotationVelocity.x * dt;
 	rotation.y += rotationVelocity.y * dt;
 	rotation.z += rotationVelocity.z * dt;
+
+	rotation.x += rotation.x * -1 * friction * dt;
+	rotation.y += rotation.y * -1 * friction * dt;
+	rotation.z += rotation.z * -1 * friction * dt;
 	
 	position += DirectX::XMVector3Transform(movementVelocity, XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z)) * dt;
 }

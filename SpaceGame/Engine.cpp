@@ -118,13 +118,21 @@ void Engine::Render(float tick, float dt)
 
 	std::pair<float, float> pt = window->mouse.GetPosDelta();
 	DirectX::XMFLOAT2 lookRotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth() };
-	player.ChangePlayerLookPitchYaw(lookRotation);
-
 	DirectX::XMFLOAT3 rotation = { 0, 0, 0 };
-	if (window->keyboard.KeyPressed(0x45))
-		rotation.z -= dt * 0.001f;
-	if (window->keyboard.KeyPressed(0x51))
-		rotation.z += dt * 0.001f;//todo regular units
+	if (window->keyboard.KeyPressed(0x12))// alt to look
+	{
+		player.ChangePlayerLookPitchYaw(lookRotation);
+	}
+	else
+	{
+		rotation.x = lookRotation.x * -1;
+		rotation.y = lookRotation.y * -1;
+	}
+
+	if (window->keyboard.KeyPressed(0x45))//e
+		rotation.z += dt * 0.001f;
+	if (window->keyboard.KeyPressed(0x51))//q
+		rotation.z -= dt * 0.001f;//todo regular units
 	player.ChangePlayerRotationVelocity(rotation);
 
 	DirectX::XMFLOAT3 translation{};

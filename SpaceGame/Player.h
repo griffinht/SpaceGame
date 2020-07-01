@@ -15,7 +15,7 @@ public:
 
 	Camera GetCamera();
 private:
-	float friction = 0.0f;
+	float friction = 0.01f;
 	DirectX::XMVECTOR movementVelocity = DirectX::XMVectorSet(0, 0, 0, 0);
 	DirectX::XMVECTOR position = DirectX::XMVectorSet(0, 0, 0, 0);
 	DirectX::XMFLOAT3 rotationVelocity = DirectX::XMFLOAT3(0, 0, 0);
