@@ -6,52 +6,31 @@
 void Player::ChangePlayerMovementVelocity(DirectX::XMVECTOR velocity)
 {
 	using namespace DirectX;
-	movementVelocity += XMVector3Transform(velocity, XMMatrixRotationRollPitchYawFromVector(rotation));//should player be updated before this???
+	velocity += XMVector3Transform(velocity, camera.GetRotation());//should player be updated before this???
 }
 
-void Player::ChangePlayerRotationVelocity(DirectX::XMVECTOR velocity)
+void Player::Rotate(DirectX::XMFLOAT3 rotation)
 {
 	using namespace DirectX;
-	rotationVelocity += velocity;
-}
-
-void Player::ChangePlayerLookPitchYaw(DirectX::XMFLOAT2 pitchYaw)
-{
-	lookPitchYaw.x += pitchYaw.x * M_PI * 2;
-	lookPitchYaw.x = std::min(std::max(lookPitchYaw.x, (float)-M_PI_2 + 0.001f), (float)M_PI_2 - 0.001f);
-	lookPitchYaw.y += pitchYaw.y * M_PI * 2;
+	camera.Rotate(XMFLOAT3(rotation.x * M_PI * 2, rotation.y * M_PI * 2, rotation.z * M_PI * 2));
 }
 
 void Player::Update(float dt)
 {
 	using namespace DirectX;
 
-	rotation += rotationVelocity * dt;
+	camera.TranslateWithRotation(velocity * dt);
 
-	rotation += rotation * -1 * friction * dt;
-	
-	position += movementVelocity * dt;
-
-	position += position * -1 * friction * dt;
+	velocity += velocity * -1 * friction * dt;
 }
 
 DirectX::XMMATRIX Player::GetProjection()
 {
 	using namespace DirectX;
-
-	XMFLOAT3 vec;
-	XMStoreFloat3(&vec, rotation);
-
-	XMMATRIX view = XMMatrixLookAtLH(
-		position,
-		position + XMVector3Transform(
-			XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
-			XMMatrixRotationRollPitchYawFromVector(rotation + XMVectorSet(lookPitchYaw.x, lookPitchYaw.y, 0.0f, 0.0f))),
-		XMVector3Transform(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), XMMatrixRotationRollPitchYawFromVector(rotation)));
-	return view * camera.GetProjectionMatrix();
+	return camera.GetViewMatrix() * camera.GetProjectionMatrix();
 }
 
-Camera Player::GetCamera()
+Camera* Player::GetCamera()
 {
-	return camera;
+	return &camera;
 }

@@ -20,6 +20,8 @@ Engine::Engine()
 		));
 	}
 
+	box = std::make_unique<Box>(window->Graphics(), rng, adist, ddist, odist, rdist);
+
 	controlThread = std::thread(&Engine::ControlLoop, this);
 
 	MSG msg;
@@ -114,26 +116,16 @@ void Engine::Render(float tick, float dt)
 		fov += 0.01f;
 	if (window->mouse.XButton2Pressed())
 		fov -= 0.01f;
-	player.GetCamera().ChangeFOV(fov);
+	player.GetCamera()->ChangeFOV(fov);
 
 	std::pair<float, float> pt = window->mouse.GetPosDelta();
-	DirectX::XMFLOAT2 lookRotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth() };
-	DirectX::XMFLOAT3 rotation = { 0, 0, 0 };
-	if (window->keyboard.KeyPressed(0x12))// alt to look
-	{
-		player.ChangePlayerLookPitchYaw(lookRotation);
-	}
-	else
-	{
-		rotation.x = lookRotation.x;
-		rotation.y = lookRotation.y;
-	}
+	DirectX::XMFLOAT3 rotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth(), 0 };
 
 	if (window->keyboard.KeyPressed(0x45))//e
 		rotation.z += dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x51))//q
 		rotation.z -= dt * 0.001f;//todo regular units
-	player.ChangePlayerRotationVelocity(DirectX::XMLoadFloat3(&rotation));
+	player.Rotate(rotation);
 
 	DirectX::XMFLOAT3 translation{};
 
@@ -162,6 +154,8 @@ void Engine::Render(float tick, float dt)
 
 			d->Draw(window->Graphics());
 		}
+		box->Update(dt);
+		box->Draw(window->Graphics());
 		window->Graphics().Present(1, 0);//this can wait for vsync, for some reason flops between taking 18ms and 11ms to complete every other frame
 	}
 	catch (Graphics::InfoException & e)
@@ -181,5 +175,5 @@ void Engine::Render(float tick, float dt)
 
 void Engine::Resize(int width, int height)
 {
-	player.GetCamera().SetAspectRatio((float)width / (float)height);
+	player.GetCamera()->SetAspectRatio((float)width / (float)height);
 }

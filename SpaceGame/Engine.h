@@ -29,6 +29,7 @@ private:
 	const float tickTime = 1000.0f / tickRate; // how long each tick takes in miliseconds
 	const bool vSync = true;
 	Player player;
+	std::unique_ptr<Box> box;
 private:
 	std::vector<std::unique_ptr<Drawable>> drawables;
 };
