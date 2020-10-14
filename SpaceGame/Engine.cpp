@@ -122,9 +122,9 @@ void Engine::Render(float tick, float dt)
 	DirectX::XMFLOAT3 rotation{ pt.second / (float)window->Graphics().GetBackBufferHeight(), pt.first / (float)window->Graphics().GetBackBufferWidth(), 0 };
 
 	if (window->keyboard.KeyPressed(0x45))//e
-		rotation.z += dt * 0.001f;
+		rotation.z -= dt * 0.001f;
 	if (window->keyboard.KeyPressed(0x51))//q
-		rotation.z -= dt * 0.001f;//todo regular units
+		rotation.z += dt * 0.001f;//todo regular units
 	player.Rotate(rotation);
 
 	DirectX::XMFLOAT3 translation{};
